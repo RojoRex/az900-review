@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZ-900 Study Guide</title>
+  <style>
+    :root {
+      --primary: #0078d4;
+      --primary-dark: #005a9e;
+      --primary-light: #e8f4fd;
+      --success: #107c10;
+      --warning: #ffb900;
+      --danger: #d13438;
+      --bg: #f8f8f8;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-light: #555;
+      --border: #e0e0e0;
+      --sidebar-bg: #f0f0f0;
+      --accent1: #0078d4;
+      --accent2: #00a4ef;
+      --accent3: #7fba00;
+      --accent4: #f25022;
+      --accent5: #737373;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7;
+    }
+
+    /* ---- TOP BAR ---- */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white; padding: 14px 24px; display: flex; align-items: center; gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .topbar h1 { font-size: 1.2rem; font-weight: 600; }
+    .topbar .subtitle { font-size: 0.8rem; opacity: 0.85; }
+    .topbar .quiz-link {
+      margin-left: auto; color: white; text-decoration: none;
+      background: rgba(255,255,255,0.15); padding: 6px 16px; border-radius: 6px;
+      font-size: 0.85rem; font-weight: 600; transition: background 0.2s;
+    }
+    .topbar .quiz-link:hover { background: rgba(255,255,255,0.3); }
+    .hamburger {
+      display: none; background: none; border: none; color: white;
+      font-size: 1.5rem; cursor: pointer; padding: 4px 8px;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      position: fixed; top: 56px; left: 0; bottom: 0; width: 280px;
+      background: var(--card); border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 16px 0; z-index: 90;
+      transition: transform 0.3s ease;
+    }
+    .sidebar h3 {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-light); padding: 12px 20px 6px; margin-top: 8px;
+    }
+    .sidebar a {
+      display: block; padding: 8px 20px; color: var(--text); text-decoration: none;
+      font-size: 0.85rem; border-left: 3px solid transparent; transition: all 0.15s;
+    }
+    .sidebar a:hover { background: var(--primary-light); color: var(--primary); }
+    .sidebar a.active { border-left-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .sidebar .progress-wrap {
+      margin: 12px 20px; background: var(--border); border-radius: 4px; height: 6px; overflow: hidden;
+    }
+    .sidebar .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; }
+    .sidebar .progress-label { font-size: 0.75rem; color: var(--text-light); padding: 4px 20px 0; }
+
+    /* ---- MAIN ---- */
+    .main {
+      margin-left: 280px; padding: 80px 40px 60px;
+      max-width: 900px;
+    }
+
+    /* ---- SECTIONS ---- */
+    .domain-header {
+      margin: 48px 0 24px; padding: 20px 24px;
+      border-radius: 10px; color: white;
+    }
+    .domain-header.d1 { background: linear-gradient(135deg, #0078d4, #005a9e); }
+    .domain-header.d2 { background: linear-gradient(135deg, #00a4ef, #0078d4); }
+    .domain-header.d3 { background: linear-gradient(135deg, #7fba00, #3a7d00); }
+    .domain-header h2 { font-size: 1.4rem; margin-bottom: 4px; }
+    .domain-header p { font-size: 0.9rem; opacity: 0.9; }
+    .domain-header:first-of-type { margin-top: 0; }
+
+    .topic {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 28px 32px; margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .topic h3 {
+      font-size: 1.15rem; color: var(--primary); margin-bottom: 14px;
+      padding-bottom: 10px; border-bottom: 2px solid var(--primary-light);
+    }
+    .topic h4 { font-size: 1rem; color: var(--text); margin: 18px 0 8px; }
+    .topic p { margin-bottom: 12px; color: var(--text); }
+    .topic ul, .topic ol { margin: 8px 0 14px 20px; }
+    .topic li { margin-bottom: 6px; }
+
+    /* Key Term */
+    .key-term {
+      background: var(--primary-light); border-left: 4px solid var(--primary);
+      padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0;
+      font-size: 0.92rem;
+    }
+    .key-term strong { color: var(--primary); }
+
+    /* Comparison tables */
+    .compare-table {
+      width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem;
+    }
+    .compare-table th {
+      background: var(--primary); color: white; padding: 10px 14px;
+      text-align: left; font-weight: 600;
+    }
+    .compare-table td {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .compare-table tr:nth-child(even) td { background: #fafafa; }
+    .compare-table .check { color: var(--success); font-weight: bold; }
+    .compare-table .cross { color: var(--danger); }
+
+    /* Tip / Exam tip boxes */
+    .tip {
+      background: #fff8e1; border-left: 4px solid var(--warning);
+      padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0;
+      font-size: 0.9rem;
+    }
+    .tip::before { content: "Exam Tip: "; font-weight: 700; color: #e6a700; }
+
+    /* Diagram-like boxes */
+    .diagram {
+      display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0;
+      justify-content: center;
+    }
+    .diagram-box {
+      padding: 12px 18px; border-radius: 8px; text-align: center;
+      font-size: 0.85rem; font-weight: 600; min-width: 120px;
+    }
+    .diagram-arrow {
+      display: flex; align-items: center; font-size: 1.2rem; color: var(--text-light);
+    }
+
+    /* Toggle / Expandable */
+    details {
+      margin: 10px 0; border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden;
+    }
+    summary {
+      padding: 12px 16px; cursor: pointer; font-weight: 600;
+      background: #fafafa; font-size: 0.95rem;
+      list-style: none;
+    }
+    summary::before { content: "▸ "; color: var(--primary); }
+    details[open] summary::before { content: "▾ "; }
+    summary::-webkit-details-marker { display: none; }
+    details .details-body { padding: 14px 16px; }
+
+    /* Checklist */
+    .checklist { list-style: none; margin-left: 0; }
+    .checklist li { padding: 4px 0; }
+    .checklist li::before { content: "☐ "; color: var(--primary); font-weight: bold; }
+    .checklist li.done::before { content: "☑ "; color: var(--success); }
+
+    @media (max-width: 800px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
+      .main { margin-left: 0; padding: 70px 18px 40px; }
+      .hamburger { display: block; }
+      .topbar .subtitle { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <div>
+    <h1>AZ-900 Study Guide</h1>
+    <div class="subtitle">Microsoft Azure Fundamentals &mdash; Complete Reference</div>
+  </div>
+  <a href="index.html" class="quiz-link">Take the Quiz &rarr;</a>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="progress-label" id="progressLabel">Reading progress: 0%</div>
+  <div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <h3>Domain 1 &mdash; Cloud Concepts</h3>
+  <a href="#what-is-cloud">What is Cloud Computing</a>
+  <a href="#shared-responsibility">Shared Responsibility Model</a>
+  <a href="#cloud-models">Cloud Models</a>
+  <a href="#cloud-benefits">Benefits of Cloud</a>
+  <a href="#capex-opex">CapEx vs OpEx</a>
+  <a href="#service-types">Cloud Service Types</a>
+
+  <h3>Domain 2 &mdash; Architecture & Services</h3>
+  <a href="#core-architecture">Core Architecture</a>
+  <a href="#compute">Compute Services</a>
+  <a href="#networking">Networking Services</a>
+  <a href="#storage">Storage Services</a>
+  <a href="#databases">Database Services</a>
+  <a href="#identity">Identity & Access</a>
+  <a href="#security">Security Services</a>
+  <a href="#additional-services">Additional Services</a>
+
+  <h3>Domain 3 &mdash; Management & Governance</h3>
+  <a href="#cost-management">Cost Management</a>
+  <a href="#governance">Governance & Compliance</a>
+  <a href="#deployment-tools">Deployment Tools</a>
+  <a href="#monitoring">Monitoring Tools</a>
+  <a href="#sla">SLAs & Lifecycle</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ============================================================ -->
+<!--                  DOMAIN 1: CLOUD CONCEPTS                     -->
+<!-- ============================================================ -->
+<div class="domain-header d1" id="domain1">
+  <h2>Domain 1: Describe Cloud Concepts</h2>
+  <p>25&ndash;30% of the exam &mdash; Cloud computing fundamentals, benefits, and service types</p>
+</div>
+
+<!-- WHAT IS CLOUD COMPUTING -->
+<div class="topic" id="what-is-cloud">
+  <h3>What is Cloud Computing?</h3>
+  <p>Cloud computing is the <strong>delivery of computing services over the internet</strong>. Instead of buying and maintaining physical servers, storage, and networking equipment, you rent them from a cloud provider like Microsoft Azure.</p>
+
+  <h4>Computing services include:</h4>
+  <ul>
+    <li><strong>Compute</strong> &mdash; Virtual machines, containers, serverless functions</li>
+    <li><strong>Storage</strong> &mdash; Files, blobs, disks, databases</li>
+    <li><strong>Networking</strong> &mdash; Virtual networks, load balancers, DNS</li>
+    <li><strong>Databases</strong> &mdash; SQL, NoSQL, caching</li>
+    <li><strong>AI & Analytics</strong> &mdash; Machine learning, cognitive services, big data</li>
+    <li><strong>And much more</strong> &mdash; IoT, DevOps, security tools</li>
+  </ul>
+
+  <h4>Five Characteristics of Cloud Computing (NIST)</h4>
+  <ol>
+    <li><strong>On-demand self-service</strong> &mdash; Provision resources without human interaction with the provider</li>
+    <li><strong>Broad network access</strong> &mdash; Available over the network from any device</li>
+    <li><strong>Resource pooling</strong> &mdash; Provider's resources are shared across multiple customers (multi-tenant)</li>
+    <li><strong>Rapid elasticity</strong> &mdash; Resources can be scaled quickly based on demand</li>
+    <li><strong>Measured service</strong> &mdash; Usage is monitored, metered, and billed transparently</li>
+  </ol>
+
+  <div class="tip">The exam may test whether you can identify which characteristics belong to cloud computing vs traditional on-premises IT.</div>
+</div>
+
+<!-- SHARED RESPONSIBILITY MODEL -->
+<div class="topic" id="shared-responsibility">
+  <h3>The Shared Responsibility Model</h3>
+  <p>Security and management in the cloud is a <strong>shared effort</strong> between the cloud provider and the customer. Who is responsible for what depends on the type of service you use.</p>
+
+  <div class="key-term"><strong>Key Idea:</strong> The cloud provider is always responsible for the physical infrastructure. The customer is always responsible for their data, accounts, and devices. Everything in between depends on the service type.</div>
+
+  <h4>What the Cloud Provider Always Manages:</h4>
+  <ul>
+    <li>Physical datacenter (building, power, cooling, physical security)</li>
+    <li>Physical network (cabling, switches, routers)</li>
+    <li>Physical hosts (servers, hardware)</li>
+  </ul>
+
+  <h4>What the Customer Always Manages:</h4>
+  <ul>
+    <li>Data &amp; information stored in the cloud</li>
+    <li>Devices that connect (phones, PCs)</li>
+    <li>Accounts &amp; identities (user access management)</li>
+  </ul>
+
+  <h4>How Responsibility Shifts by Service Type:</h4>
+  <table class="compare-table">
+    <tr><th>Responsibility</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+    <tr><td>Physical infrastructure</td><td>Provider</td><td>Provider</td><td>Provider</td></tr>
+    <tr><td>Operating system</td><td><strong>Customer</strong></td><td>Provider</td><td>Provider</td></tr>
+    <tr><td>Network controls</td><td><strong>Customer</strong></td><td>Shared</td><td>Provider</td></tr>
+    <tr><td>Applications</td><td><strong>Customer</strong></td><td><strong>Customer</strong></td><td>Provider</td></tr>
+    <tr><td>Identity &amp; access</td><td><strong>Customer</strong></td><td><strong>Customer</strong></td><td><strong>Customer</strong></td></tr>
+    <tr><td>Data</td><td><strong>Customer</strong></td><td><strong>Customer</strong></td><td><strong>Customer</strong></td></tr>
+  </table>
+
+  <div class="tip">Remember: As you move from IaaS &rarr; PaaS &rarr; SaaS, more responsibility shifts to the provider. But data and identity are ALWAYS the customer's responsibility.</div>
+</div>
+
+<!-- CLOUD MODELS -->
+<div class="topic" id="cloud-models">
+  <h3>Cloud Deployment Models</h3>
+  <p>There are three main ways to deploy cloud resources:</p>
+
+  <h4>1. Public Cloud</h4>
+  <ul>
+    <li>Owned and operated by a third-party provider (Microsoft, AWS, Google)</li>
+    <li>Resources are shared across multiple organizations (multi-tenant)</li>
+    <li>Accessed over the internet</li>
+    <li>No upfront CapEx &mdash; pay-as-you-go</li>
+    <li>Highest scalability, lowest management burden</li>
+  </ul>
+
+  <h4>2. Private Cloud</h4>
+  <ul>
+    <li>Dedicated to a single organization</li>
+    <li>Can be hosted on-premises or by a third party</li>
+    <li>Organization has full control</li>
+    <li>Higher cost, more maintenance</li>
+    <li>Best for strict compliance or security requirements</li>
+  </ul>
+
+  <h4>3. Hybrid Cloud</h4>
+  <ul>
+    <li>Combines public and private cloud (or on-premises)</li>
+    <li>Data and applications can move between environments</li>
+    <li>Maximum flexibility &mdash; keep sensitive data private, burst to public cloud for extra capacity</li>
+    <li>Most common in enterprise environments</li>
+  </ul>
+
+  <table class="compare-table">
+    <tr><th>Feature</th><th>Public</th><th>Private</th><th>Hybrid</th></tr>
+    <tr><td>Upfront cost</td><td>None</td><td>High</td><td>Varies</td></tr>
+    <tr><td>Scalability</td><td>Highest</td><td>Limited</td><td>High</td></tr>
+    <tr><td>Control</td><td>Least</td><td>Most</td><td>Balanced</td></tr>
+    <tr><td>Maintenance</td><td>Provider</td><td>You</td><td>Split</td></tr>
+    <tr><td>Use case</td><td>General workloads</td><td>Strict compliance</td><td>Flexible/mixed</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Multi-cloud</strong> means using multiple public cloud providers (e.g., Azure + AWS) to avoid vendor lock-in or leverage different strengths.</div>
+
+  <div class="tip">Know the differences between public, private, and hybrid cloud. The exam loves scenario questions asking which model fits a given situation.</div>
+</div>
+
+<!-- CLOUD BENEFITS -->
+<div class="topic" id="cloud-benefits">
+  <h3>Benefits of Cloud Computing</h3>
+  <p>The exam tests your understanding of each benefit. Learn what each one means and be able to match it to a scenario.</p>
+
+  <details>
+    <summary>High Availability</summary>
+    <div class="details-body">
+      <p>Services remain available with <strong>minimal downtime</strong>, even when failures occur. Measured by uptime percentages in SLAs.</p>
+      <ul>
+        <li>99.9% uptime = ~8.7 hours downtime/year</li>
+        <li>99.99% uptime = ~52 minutes downtime/year</li>
+      </ul>
+      <p><strong>How Azure achieves it:</strong> Availability Zones, geo-redundancy, load balancing, auto-failover.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Scalability</summary>
+    <div class="details-body">
+      <p>The ability to <strong>add or remove resources</strong> to handle changes in demand.</p>
+      <ul>
+        <li><strong>Vertical scaling (scale up/down)</strong> &mdash; Add more CPU or RAM to an existing VM</li>
+        <li><strong>Horizontal scaling (scale out/in)</strong> &mdash; Add or remove VM instances</li>
+      </ul>
+      <p>Vertical = making one machine bigger. Horizontal = adding more machines.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Elasticity</summary>
+    <div class="details-body">
+      <p>Resources are scaled <strong>automatically</strong> in response to demand. You don't have to predict traffic &mdash; the system adjusts.</p>
+      <p><strong>Example:</strong> An e-commerce site automatically scales up during Black Friday and scales back down after.</p>
+      <p><em>Scalability</em> = the ability to scale. <em>Elasticity</em> = scaling happens automatically.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Reliability</summary>
+    <div class="details-body">
+      <p>The ability of a system to <strong>recover from failures and continue functioning</strong>.</p>
+      <p>Cloud's decentralized design (resources in multiple regions) supports reliable infrastructure. Even if one region goes down, others keep running.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Predictability</summary>
+    <div class="details-body">
+      <p>Two aspects:</p>
+      <ul>
+        <li><strong>Performance predictability</strong> &mdash; Autoscaling, load balancing, and high availability ensure consistent user experience</li>
+        <li><strong>Cost predictability</strong> &mdash; Track spending, forecast costs, and use analytics to optimize budget</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Security</summary>
+    <div class="details-body">
+      <p>Cloud providers invest billions in security. They offer tools like firewalls, identity management, encryption, and threat detection. However, security is still a shared responsibility &mdash; you must configure and manage your own access controls and data.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Governance</summary>
+    <div class="details-body">
+      <p>Cloud features like templates, policies, and auditing help ensure your resources <strong>comply with corporate standards and regulations</strong>. Policies can flag or even auto-fix resources that fall out of compliance.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Manageability</summary>
+    <div class="details-body">
+      <p>Two meanings:</p>
+      <ul>
+        <li><strong>Management OF the cloud</strong> &mdash; Auto-scaling, template-based deployment, automated monitoring and alerts</li>
+        <li><strong>Management IN the cloud</strong> &mdash; Multiple tools: web portal, CLI, PowerShell, APIs</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Agility</summary>
+    <div class="details-body">
+      <p>Deploy and configure resources <strong>rapidly</strong>. What used to take weeks (ordering hardware, racking servers) now takes minutes in the cloud.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Disaster Recovery</summary>
+    <div class="details-body">
+      <p>Replicate data and apps to a secondary region so that services can be <strong>restored quickly</strong> after a major event (natural disaster, data corruption, etc.).</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Fault Tolerance</summary>
+    <div class="details-body">
+      <p>A system continues operating even when <strong>individual components fail</strong>. Achieved through redundancy &mdash; having backup components ready to take over.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Geo-distribution</summary>
+    <div class="details-body">
+      <p>Deploy apps and data to <strong>regions around the world</strong>, ensuring users everywhere get fast performance and the system can survive regional outages.</p>
+    </div>
+  </details>
+</div>
+
+<!-- CAPEX vs OPEX -->
+<div class="topic" id="capex-opex">
+  <h3>CapEx vs OpEx</h3>
+
+  <table class="compare-table">
+    <tr><th></th><th>Capital Expenditure (CapEx)</th><th>Operational Expenditure (OpEx)</th></tr>
+    <tr><td><strong>What</strong></td><td>Upfront spending on physical infrastructure</td><td>Spending on services/products as you use them</td></tr>
+    <tr><td><strong>When you pay</strong></td><td>Large cost upfront</td><td>Pay as you go</td></tr>
+    <tr><td><strong>Value over time</strong></td><td>Depreciates over time</td><td>No depreciation — current expense</td></tr>
+    <tr><td><strong>Example</strong></td><td>Buying servers for a datacenter</td><td>Renting VMs on Azure monthly</td></tr>
+    <tr><td><strong>Cloud model</strong></td><td>On-premises / Private cloud</td><td>Public cloud / Hybrid cloud</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Consumption-based pricing</strong> = You only pay for the resources you actually use. No usage = no cost. This is the core OpEx advantage of cloud.</div>
+
+  <div class="tip">The exam often asks about the financial benefits of cloud. Know that cloud shifts CapEx to OpEx and follows a consumption-based model.</div>
+</div>
+
+<!-- SERVICE TYPES -->
+<div class="topic" id="service-types">
+  <h3>Cloud Service Types: IaaS, PaaS, SaaS</h3>
+
+  <table class="compare-table">
+    <tr><th></th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+    <tr><td><strong>Full name</strong></td><td>Infrastructure as a Service</td><td>Platform as a Service</td><td>Software as a Service</td></tr>
+    <tr><td><strong>You manage</strong></td><td>OS, apps, data, runtime, middleware</td><td>Apps and data</td><td>Data and users only</td></tr>
+    <tr><td><strong>Provider manages</strong></td><td>Physical hardware, networking, virtualization</td><td>Everything below + OS, runtime, middleware</td><td>Everything</td></tr>
+    <tr><td><strong>Control level</strong></td><td>Most</td><td>Medium</td><td>Least</td></tr>
+    <tr><td><strong>Flexibility</strong></td><td>Highest</td><td>Medium</td><td>Lowest</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Lift-and-shift migration, full control needed</td><td>Developers building apps</td><td>End users using ready-made software</td></tr>
+    <tr><td><strong>Azure examples</strong></td><td>Virtual Machines, Virtual Networks</td><td>App Service, Azure SQL Database, Azure Functions</td><td>Microsoft 365, Dynamics 365</td></tr>
+  </table>
+
+  <h4>Think of it like pizza:</h4>
+  <ul>
+    <li><strong>On-premises</strong> = You make everything from scratch at home</li>
+    <li><strong>IaaS</strong> = You buy dough and ingredients (infrastructure), you cook and serve</li>
+    <li><strong>PaaS</strong> = You get a pre-made pizza to customize and bake (platform handles the base)</li>
+    <li><strong>SaaS</strong> = Pizza delivered to your door (ready to eat)</li>
+  </ul>
+
+  <div class="key-term"><strong>Serverless computing</strong> (e.g., Azure Functions) is a type of PaaS where you don't even think about servers. You write code, and the cloud runs it in response to events. You only pay per execution.</div>
+
+  <div class="tip">Be able to identify which Azure service maps to which service type, and match scenarios to the correct type.</div>
+</div>
+
+
+<!-- ============================================================ -->
+<!--            DOMAIN 2: AZURE ARCHITECTURE & SERVICES            -->
+<!-- ============================================================ -->
+<div class="domain-header d2" id="domain2">
+  <h2>Domain 2: Describe Azure Architecture and Services</h2>
+  <p>35&ndash;40% of the exam &mdash; The biggest domain. Core components, compute, networking, storage, identity, and security</p>
+</div>
+
+<!-- CORE ARCHITECTURE -->
+<div class="topic" id="core-architecture">
+  <h3>Core Architectural Components</h3>
+
+  <h4>Azure Organizational Hierarchy</h4>
+  <p>Azure resources are organized in a hierarchy. Policies and access applied at higher levels flow down to lower levels.</p>
+
+  <div class="diagram">
+    <div class="diagram-box" style="background:#1a1a2e;color:white;">Management Groups</div>
+    <div class="diagram-arrow">&rarr;</div>
+    <div class="diagram-box" style="background:#16213e;color:white;">Subscriptions</div>
+    <div class="diagram-arrow">&rarr;</div>
+    <div class="diagram-box" style="background:#0f3460;color:white;">Resource Groups</div>
+    <div class="diagram-arrow">&rarr;</div>
+    <div class="diagram-box" style="background:#0078d4;color:white;">Resources</div>
+  </div>
+
+  <details>
+    <summary>Management Groups</summary>
+    <div class="details-body">
+      <ul>
+        <li>The top level of organization (above subscriptions)</li>
+        <li>Apply policies and RBAC across multiple subscriptions</li>
+        <li>Can be nested up to 6 levels deep</li>
+        <li>One root management group per Azure AD tenant</li>
+        <li><strong>Example:</strong> An enterprise might have management groups for "Production" and "Development," each containing multiple subscriptions</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Subscriptions</summary>
+    <div class="details-body">
+      <ul>
+        <li>A <strong>billing boundary</strong> &mdash; separate bill per subscription</li>
+        <li>An <strong>access control boundary</strong> &mdash; manage permissions per subscription</li>
+        <li>An account can have multiple subscriptions</li>
+        <li>Common pattern: separate subscriptions for dev, test, and production</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Resource Groups</summary>
+    <div class="details-body">
+      <ul>
+        <li>Logical containers for related Azure resources</li>
+        <li>Every resource must be in exactly <strong>one</strong> resource group</li>
+        <li>Resources can interact across resource groups</li>
+        <li><strong>Deleting a resource group deletes ALL resources in it</strong></li>
+        <li>Cannot be nested</li>
+        <li>Tags are NOT inherited by resources inside the group (by default)</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Resources</summary>
+    <div class="details-body">
+      <p>Anything you create in Azure is a resource: a VM, a database, a storage account, a virtual network, etc. Each resource exists in exactly one resource group.</p>
+    </div>
+  </details>
+
+  <h4>Azure Regions</h4>
+  <ul>
+    <li>A <strong>geographical area</strong> containing one or more datacenters</li>
+    <li>Azure has <strong>60+ regions</strong> across the globe</li>
+    <li>You choose the region when deploying resources (affects latency, compliance, pricing)</li>
+    <li>Not all services are available in all regions</li>
+  </ul>
+
+  <h4>Region Pairs</h4>
+  <ul>
+    <li>Two regions in the same geography paired together (e.g., East US ↔ West US)</li>
+    <li>At least <strong>300 miles apart</strong> for disaster recovery</li>
+    <li>Azure updates one region in the pair at a time (no simultaneous downtime)</li>
+    <li>If a region fails, its pair is prioritized for recovery</li>
+  </ul>
+
+  <h4>Availability Zones</h4>
+  <ul>
+    <li>Physically separate datacenters <strong>within a single region</strong></li>
+    <li>Each zone has independent power, cooling, and networking</li>
+    <li>Minimum of <strong>3 zones</strong> per supported region</li>
+    <li>Protects against datacenter-level failures</li>
+    <li>Provides <strong>99.99% VM SLA</strong></li>
+  </ul>
+
+  <h4>Sovereign Regions</h4>
+  <ul>
+    <li>Isolated Azure instances for compliance/legal requirements</li>
+    <li><strong>Azure Government</strong> &mdash; US government agencies (separate physical and logical network)</li>
+    <li><strong>Azure China</strong> &mdash; Operated by 21Vianet (data stays in China)</li>
+  </ul>
+
+  <div class="tip">Know the hierarchy: Management Groups &gt; Subscriptions &gt; Resource Groups &gt; Resources. Also remember that deleting a resource group deletes everything in it.</div>
+</div>
+
+<!-- COMPUTE -->
+<div class="topic" id="compute">
+  <h3>Compute Services</h3>
+  <p>Compute services provide the processing power to run your applications.</p>
+
+  <table class="compare-table">
+    <tr><th>Service</th><th>What It Is</th><th>Type</th><th>Best For</th></tr>
+    <tr><td><strong>Virtual Machines</strong></td><td>Full VMs you control (OS, software, config)</td><td>IaaS</td><td>Lift-and-shift, full control</td></tr>
+    <tr><td><strong>VM Scale Sets</strong></td><td>Group of identical, auto-scaling, load-balanced VMs</td><td>IaaS</td><td>Large-scale workloads</td></tr>
+    <tr><td><strong>App Service</strong></td><td>Managed platform for web apps, APIs, mobile backends</td><td>PaaS</td><td>Web apps without managing servers</td></tr>
+    <tr><td><strong>Azure Functions</strong></td><td>Event-driven serverless code execution</td><td>PaaS/Serverless</td><td>Microservices, automation, event processing</td></tr>
+    <tr><td><strong>Container Instances</strong></td><td>Run containers without managing VMs</td><td>PaaS</td><td>Simple containers, quick tasks</td></tr>
+    <tr><td><strong>Kubernetes Service (AKS)</strong></td><td>Managed Kubernetes for container orchestration</td><td>PaaS</td><td>Complex containerized apps at scale</td></tr>
+    <tr><td><strong>Virtual Desktop</strong></td><td>Cloud-hosted Windows desktop experience</td><td>PaaS</td><td>Remote workers, BYOD scenarios</td></tr>
+    <tr><td><strong>Dedicated Host</strong></td><td>Physical server dedicated to your organization only</td><td>IaaS</td><td>Compliance requiring hardware isolation</td></tr>
+  </table>
+
+  <h4>Availability Concepts for VMs:</h4>
+  <ul>
+    <li><strong>Availability Sets</strong> &mdash; Distribute VMs across <em>Fault Domains</em> (separate racks) and <em>Update Domains</em> (maintenance groups) within a single datacenter</li>
+    <li><strong>Availability Zones</strong> &mdash; Distribute VMs across separate datacenters within a region</li>
+    <li><strong>VM Scale Sets</strong> &mdash; Automatically creates and manages identical VMs with auto-scaling</li>
+  </ul>
+
+  <div class="tip">Know the difference between Availability Sets (same datacenter, different racks) and Availability Zones (different datacenters in same region).</div>
+</div>
+
+<!-- NETWORKING -->
+<div class="topic" id="networking">
+  <h3>Networking Services</h3>
+
+  <table class="compare-table">
+    <tr><th>Service</th><th>What It Does</th><th>Key Detail</th></tr>
+    <tr><td><strong>Virtual Network (VNet)</strong></td><td>Private network in Azure for your resources</td><td>Fundamental building block; enables resource communication</td></tr>
+    <tr><td><strong>VNet Peering</strong></td><td>Connects two VNets privately</td><td>Traffic goes over Microsoft backbone, not public internet</td></tr>
+    <tr><td><strong>VPN Gateway</strong></td><td>Encrypted connection between Azure and on-premises</td><td>Uses the <strong>public internet</strong> (but encrypted)</td></tr>
+    <tr><td><strong>ExpressRoute</strong></td><td>Private dedicated connection to Azure</td><td><strong>Does NOT use the public internet</strong>; higher bandwidth, lower latency</td></tr>
+    <tr><td><strong>Azure DNS</strong></td><td>Hosts your DNS domains on Azure</td><td>Does NOT support domain registration</td></tr>
+    <tr><td><strong>Load Balancer</strong></td><td>Distributes traffic across VMs</td><td>Layer 4 (TCP/UDP); high performance</td></tr>
+    <tr><td><strong>Application Gateway</strong></td><td>Web traffic load balancer with WAF</td><td>Layer 7 (HTTP/HTTPS); URL-based routing</td></tr>
+    <tr><td><strong>Front Door</strong></td><td>Global load balancer + CDN + WAF</td><td>Edge-level entry point for global web apps</td></tr>
+    <tr><td><strong>CDN</strong></td><td>Caches content at edge locations worldwide</td><td>Reduces latency for static content</td></tr>
+    <tr><td><strong>Azure Bastion</strong></td><td>Secure RDP/SSH to VMs through the portal</td><td>No public IP needed on VMs</td></tr>
+    <tr><td><strong>Traffic Manager</strong></td><td>DNS-based global traffic routing</td><td>Routes users to the best endpoint based on performance, priority, etc.</td></tr>
+  </table>
+
+  <div class="key-term"><strong>VPN Gateway vs ExpressRoute:</strong> VPN goes over the public internet (encrypted). ExpressRoute uses a private dedicated connection. ExpressRoute = more reliable, faster, more expensive.</div>
+
+  <div class="key-term"><strong>Load Balancer vs Application Gateway:</strong> Load Balancer works at Layer 4 (TCP/UDP transport level). Application Gateway works at Layer 7 (HTTP/HTTPS application level) and can route based on URL paths.</div>
+
+  <div class="tip">A very common exam question: "A company needs a private connection to Azure that doesn't go over the internet." The answer is ExpressRoute.</div>
+</div>
+
+<!-- STORAGE -->
+<div class="topic" id="storage">
+  <h3>Storage Services</h3>
+
+  <h4>Azure Storage Account</h4>
+  <p>A storage account provides a unique namespace for your Azure Storage data. It's the container for all the storage types below. Every object has a unique URL address.</p>
+
+  <h4>Storage Types</h4>
+  <table class="compare-table">
+    <tr><th>Service</th><th>What It Stores</th><th>Protocol/Access</th></tr>
+    <tr><td><strong>Blob Storage</strong></td><td>Unstructured data (images, videos, backups, logs)</td><td>HTTP/HTTPS, REST API</td></tr>
+    <tr><td><strong>Azure Files</strong></td><td>Managed cloud file shares</td><td>SMB and NFS protocols</td></tr>
+    <tr><td><strong>Queue Storage</strong></td><td>Messages for async processing</td><td>HTTP/HTTPS</td></tr>
+    <tr><td><strong>Table Storage</strong></td><td>Structured NoSQL key-value data</td><td>HTTP/HTTPS, OData</td></tr>
+    <tr><td><strong>Managed Disks</strong></td><td>Block storage for VMs</td><td>Attached directly to VMs</td></tr>
+  </table>
+
+  <h4>Blob Storage Access Tiers</h4>
+  <table class="compare-table">
+    <tr><th>Tier</th><th>When to Use</th><th>Storage Cost</th><th>Access Cost</th><th>Min. Duration</th></tr>
+    <tr><td><strong>Hot</strong></td><td>Frequently accessed data</td><td>Highest</td><td>Lowest</td><td>None</td></tr>
+    <tr><td><strong>Cool</strong></td><td>Infrequently accessed, short-term backup</td><td>Lower</td><td>Higher</td><td>30 days</td></tr>
+    <tr><td><strong>Archive</strong></td><td>Rarely accessed, long-term archive</td><td>Lowest</td><td>Highest</td><td>180 days</td></tr>
+  </table>
+  <div class="key-term"><strong>Archive tier</strong> data is stored <strong>offline</strong>. To read it, you must first "rehydrate" it to hot or cool tier, which can take hours.</div>
+
+  <h4>Storage Redundancy Options</h4>
+  <table class="compare-table">
+    <tr><th>Type</th><th>Copies</th><th>Where</th><th>Protects Against</th></tr>
+    <tr><td><strong>LRS</strong> (Locally Redundant)</td><td>3</td><td>Single datacenter</td><td>Disk/rack failures</td></tr>
+    <tr><td><strong>ZRS</strong> (Zone-Redundant)</td><td>3</td><td>3 Availability Zones in one region</td><td>Datacenter failure</td></tr>
+    <tr><td><strong>GRS</strong> (Geo-Redundant)</td><td>6</td><td>Primary region (3 LRS) + Secondary region (3 LRS)</td><td>Regional outage</td></tr>
+    <tr><td><strong>GZRS</strong> (Geo-Zone-Redundant)</td><td>6</td><td>Primary region (3 ZRS) + Secondary region (3 LRS)</td><td>Zone + regional failure</td></tr>
+  </table>
+  <p><strong>RA-GRS / RA-GZRS</strong> = Same as GRS/GZRS but adds <strong>read access</strong> to the secondary region at any time (not just during failover).</p>
+
+  <h4>Data Migration Tools</h4>
+  <ul>
+    <li><strong>Azure Migrate</strong> &mdash; Central hub for discovering, assessing, and migrating on-premises resources to Azure</li>
+    <li><strong>Azure Data Box</strong> &mdash; Physical device shipped to you for large data transfers (up to 80 TB)</li>
+    <li><strong>AzCopy</strong> &mdash; Command-line tool for copying data to/from storage accounts</li>
+    <li><strong>Storage Explorer</strong> &mdash; GUI application for managing Azure Storage data</li>
+    <li><strong>Azure File Sync</strong> &mdash; Syncs on-premises Windows file servers with Azure Files</li>
+  </ul>
+
+  <div class="tip">Know the redundancy types and what each protects against. Also remember: LRS = cheapest but least resilient. GZRS = most resilient.</div>
+</div>
+
+<!-- DATABASES -->
+<div class="topic" id="databases">
+  <h3>Database Services</h3>
+
+  <table class="compare-table">
+    <tr><th>Service</th><th>Type</th><th>Key Feature</th></tr>
+    <tr><td><strong>Azure SQL Database</strong></td><td>Relational (PaaS)</td><td>Fully managed SQL Server engine; handles patching, backups, HA</td></tr>
+    <tr><td><strong>Azure SQL Managed Instance</strong></td><td>Relational (PaaS)</td><td>Near 100% SQL Server compatibility; best for lift-and-shift</td></tr>
+    <tr><td><strong>Azure Cosmos DB</strong></td><td>NoSQL (globally distributed)</td><td>Multi-model (SQL, MongoDB, Cassandra, Gremlin, Table); single-digit ms latency; 99.999% SLA</td></tr>
+    <tr><td><strong>Azure Database for MySQL</strong></td><td>Relational (PaaS)</td><td>Fully managed MySQL community edition</td></tr>
+    <tr><td><strong>Azure Database for PostgreSQL</strong></td><td>Relational (PaaS)</td><td>Fully managed PostgreSQL; flexible server option</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Azure Cosmos DB</strong> is the go-to answer when the question mentions: globally distributed, multi-model, single-digit millisecond latency, or 99.999% availability.</div>
+</div>
+
+<!-- IDENTITY -->
+<div class="topic" id="identity">
+  <h3>Identity, Access, and Security</h3>
+
+  <h4>Microsoft Entra ID (formerly Azure Active Directory)</h4>
+  <p>Microsoft's <strong>cloud-based identity and access management</strong> service. It is NOT the same as on-premises Active Directory.</p>
+
+  <table class="compare-table">
+    <tr><th></th><th>On-premises Active Directory</th><th>Microsoft Entra ID</th></tr>
+    <tr><td><strong>Location</strong></td><td>On-premises servers</td><td>Cloud</td></tr>
+    <tr><td><strong>Protocols</strong></td><td>Kerberos, LDAP, NTLM</td><td>SAML, OAuth, OpenID Connect, REST APIs</td></tr>
+    <tr><td><strong>Structure</strong></td><td>Organizational Units, Group Policy</td><td>Flat structure, Conditional Access</td></tr>
+    <tr><td><strong>Use case</strong></td><td>Corporate LAN authentication</td><td>Internet-based authentication for cloud/SaaS</td></tr>
+  </table>
+
+  <h4>Key Identity Features</h4>
+  <ul>
+    <li><strong>Single Sign-On (SSO)</strong> &mdash; Sign in once, access multiple apps without re-entering credentials</li>
+    <li><strong>Multi-Factor Authentication (MFA)</strong> &mdash; Requires 2+ verification factors: something you <em>know</em> (password) + something you <em>have</em> (phone) + something you <em>are</em> (biometric)</li>
+    <li><strong>Conditional Access</strong> &mdash; IF-THEN policies: IF a user meets certain conditions (location, device, risk), THEN require additional verification or block access</li>
+    <li><strong>External Identities</strong> &mdash; Let people outside your org sign in with their own credentials (B2B for partners, B2C for consumers)</li>
+    <li><strong>Passwordless Authentication</strong> &mdash; Sign in with Windows Hello, FIDO2 keys, or the Authenticator app (no password needed)</li>
+  </ul>
+
+  <h4>Azure RBAC (Role-Based Access Control)</h4>
+  <p>Controls <strong>who</strong> can do <strong>what</strong> on which Azure resources.</p>
+  <ul>
+    <li>Applied at a <strong>scope</strong>: Management Group &gt; Subscription &gt; Resource Group &gt; Resource</li>
+    <li>Permissions <strong>inherit downward</strong></li>
+    <li><strong>Built-in roles:</strong></li>
+  </ul>
+  <table class="compare-table">
+    <tr><th>Role</th><th>Can Do</th></tr>
+    <tr><td><strong>Owner</strong></td><td>Full access + can assign roles to others</td></tr>
+    <tr><td><strong>Contributor</strong></td><td>Full access but CANNOT assign roles</td></tr>
+    <tr><td><strong>Reader</strong></td><td>View only &mdash; cannot change anything</td></tr>
+    <tr><td><strong>User Access Administrator</strong></td><td>Manage user access to resources</td></tr>
+  </table>
+
+  <div class="key-term"><strong>RBAC</strong> controls access to Azure resources. <strong>Entra ID roles</strong> control access to Entra ID objects (users, groups). They are separate systems.</div>
+
+  <h4>Security Models</h4>
+
+  <details>
+    <summary>Zero Trust</summary>
+    <div class="details-body">
+      <p>A security model that <strong>assumes breach</strong> and treats every request as if it comes from an untrusted network.</p>
+      <p><strong>Three principles:</strong></p>
+      <ol>
+        <li><strong>Verify explicitly</strong> &mdash; Always authenticate and authorize based on all available data</li>
+        <li><strong>Use least privilege access</strong> &mdash; Limit access to the minimum necessary</li>
+        <li><strong>Assume breach</strong> &mdash; Minimize blast radius and segment access; verify end-to-end encryption</li>
+      </ol>
+    </div>
+  </details>
+
+  <details>
+    <summary>Defense in Depth</summary>
+    <div class="details-body">
+      <p>A <strong>layered approach</strong> to security. If one layer fails, the next one stops the attacker.</p>
+      <p><strong>Layers (outside in):</strong></p>
+      <ol>
+        <li><strong>Physical security</strong> &mdash; Datacenter access controls</li>
+        <li><strong>Identity &amp; access</strong> &mdash; MFA, Conditional Access, SSO</li>
+        <li><strong>Perimeter</strong> &mdash; DDoS protection, firewalls</li>
+        <li><strong>Network</strong> &mdash; NSGs, subnets, deny by default</li>
+        <li><strong>Compute</strong> &mdash; Secure VMs, patching, endpoint protection</li>
+        <li><strong>Application</strong> &mdash; Secure code, vulnerability management</li>
+        <li><strong>Data</strong> &mdash; Encryption at rest and in transit</li>
+      </ol>
+    </div>
+  </details>
+
+  <div class="tip">Know the three Zero Trust principles (verify explicitly, least privilege, assume breach) and the Defense in Depth layers.</div>
+</div>
+
+<!-- SECURITY SERVICES -->
+<div class="topic" id="security">
+  <h3>Security Services</h3>
+
+  <table class="compare-table">
+    <tr><th>Service</th><th>What It Does</th></tr>
+    <tr><td><strong>Microsoft Defender for Cloud</strong></td><td>Security posture management (CSPM) + threat protection. Provides security recommendations, secure score, and threat alerts across Azure, on-premises, and multi-cloud.</td></tr>
+    <tr><td><strong>Azure Key Vault</strong></td><td>Securely stores and manages secrets (passwords, API keys), encryption keys, and SSL/TLS certificates. Centralized, audited, and access-controlled.</td></tr>
+    <tr><td><strong>Azure DDoS Protection</strong></td><td>Protects against DDoS attacks. Basic tier is free and automatic. Standard tier adds adaptive tuning, attack analytics, and alerts.</td></tr>
+    <tr><td><strong>Azure Firewall</strong></td><td>Managed, stateful firewall-as-a-service. Provides application and network-level filtering, threat intelligence, FQDN filtering, and centralized logging.</td></tr>
+    <tr><td><strong>NSGs (Network Security Groups)</strong></td><td>Basic traffic filtering with inbound/outbound rules based on IP, port, and protocol. Applied at the subnet or NIC level.</td></tr>
+    <tr><td><strong>Azure Bastion</strong></td><td>Provides secure RDP/SSH access to VMs through the Azure portal without exposing public IPs. Connection via TLS in the browser.</td></tr>
+    <tr><td><strong>Microsoft Sentinel</strong></td><td>Cloud-native SIEM (Security Information &amp; Event Management) and SOAR (Security Orchestration, Automation &amp; Response). Collects data, detects threats with AI, and automates responses.</td></tr>
+  </table>
+
+  <div class="key-term"><strong>NSGs vs Azure Firewall:</strong> NSGs = basic rules at subnet/NIC level. Azure Firewall = full enterprise firewall with threat intelligence, FQDN filtering, and centralized management. They complement each other.</div>
+</div>
+
+<!-- ADDITIONAL SERVICES -->
+<div class="topic" id="additional-services">
+  <h3>Additional Azure Services</h3>
+  <p>The exam may touch on these. Know what each one does at a high level.</p>
+
+  <h4>IoT (Internet of Things)</h4>
+  <ul>
+    <li><strong>Azure IoT Hub</strong> &mdash; Central message hub for bi-directional communication between your app and IoT devices. You have full control and configuration.</li>
+    <li><strong>Azure IoT Central</strong> &mdash; Fully managed SaaS solution for IoT. Less customization but easier to get started. No deep cloud expertise needed.</li>
+  </ul>
+
+  <h4>Big Data & Analytics</h4>
+  <ul>
+    <li><strong>Azure Synapse Analytics</strong> &mdash; Unified analytics combining data warehousing + big data analytics</li>
+    <li><strong>Azure HDInsight</strong> &mdash; Managed open-source analytics (Hadoop, Spark, Hive, Kafka)</li>
+    <li><strong>Azure Databricks</strong> &mdash; Apache Spark-based analytics platform for data engineering and ML</li>
+  </ul>
+
+  <h4>AI & Machine Learning</h4>
+  <ul>
+    <li><strong>Azure Machine Learning</strong> &mdash; Full ML platform for building, training, and deploying models</li>
+    <li><strong>Azure AI Services</strong> (Cognitive Services) &mdash; Pre-built AI APIs: Vision, Speech, Language, Decision. No ML expertise needed.</li>
+    <li><strong>Azure Bot Service</strong> &mdash; Build intelligent conversational bots</li>
+  </ul>
+
+  <h4>DevOps</h4>
+  <ul>
+    <li><strong>Azure DevOps</strong> &mdash; Suite of tools: Boards (work tracking), Repos (Git), Pipelines (CI/CD), Test Plans, Artifacts (packages)</li>
+    <li><strong>GitHub + GitHub Actions</strong> &mdash; Code hosting + CI/CD workflows (Microsoft owns GitHub)</li>
+    <li><strong>Azure DevTest Labs</strong> &mdash; Quickly spin up dev/test environments with cost controls</li>
+  </ul>
+
+  <h4>Marketplace</h4>
+  <p><strong>Azure Marketplace</strong> &mdash; Online store with thousands of apps, services, and VM images from Microsoft and partners, all certified for Azure.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!--          DOMAIN 3: MANAGEMENT & GOVERNANCE                    -->
+<!-- ============================================================ -->
+<div class="domain-header d3" id="domain3">
+  <h2>Domain 3: Describe Azure Management and Governance</h2>
+  <p>30&ndash;35% of the exam &mdash; Cost, governance, compliance, deployment tools, and monitoring</p>
+</div>
+
+<!-- COST MANAGEMENT -->
+<div class="topic" id="cost-management">
+  <h3>Cost Management in Azure</h3>
+
+  <h4>Factors That Affect Azure Costs</h4>
+  <ul>
+    <li><strong>Resource type &amp; configuration</strong> &mdash; VM size, storage tier, database tier, etc.</li>
+    <li><strong>Usage / consumption</strong> &mdash; How much you actually use</li>
+    <li><strong>Region</strong> &mdash; Prices vary by region</li>
+    <li><strong>Data transfer</strong> &mdash; Inbound is usually free; outbound is charged</li>
+    <li><strong>Pricing model</strong> &mdash; Pay-as-you-go vs reserved vs spot</li>
+  </ul>
+
+  <h4>Cost Optimization Options</h4>
+  <table class="compare-table">
+    <tr><th>Option</th><th>How It Works</th><th>Savings</th></tr>
+    <tr><td><strong>Azure Reservations</strong></td><td>Commit to 1 or 3 years of specific resources</td><td>Up to 72% off pay-as-you-go</td></tr>
+    <tr><td><strong>Spot VMs</strong></td><td>Use Azure's unused capacity at deep discounts; can be evicted with 30 seconds notice</td><td>Up to 90% off</td></tr>
+    <tr><td><strong>Azure Hybrid Benefit</strong></td><td>Use existing Windows Server or SQL Server licenses on Azure</td><td>Significant savings</td></tr>
+    <tr><td><strong>Right-sizing</strong></td><td>Choose the appropriate VM size for your workload</td><td>Avoid over-provisioning</td></tr>
+    <tr><td><strong>Auto-shutdown</strong></td><td>Automatically shut down dev/test VMs after hours</td><td>Avoid paying for idle resources</td></tr>
+  </table>
+
+  <h4>Cost Management Tools</h4>
+  <table class="compare-table">
+    <tr><th>Tool</th><th>Purpose</th><th>When to Use</th></tr>
+    <tr><td><strong>Azure Pricing Calculator</strong></td><td>Estimate costs for specific Azure products BEFORE deploying</td><td>"How much will 5 VMs and a SQL DB cost?"</td></tr>
+    <tr><td><strong>TCO Calculator</strong></td><td>Compare on-premises costs vs Azure costs</td><td>"How much will we save migrating to Azure?"</td></tr>
+    <tr><td><strong>Azure Cost Management + Billing</strong></td><td>Analyze actual costs, set budgets, create alerts</td><td>"Where is my money going? Alert me at $500."</td></tr>
+    <tr><td><strong>Azure Advisor (Cost)</strong></td><td>Personalized cost-saving recommendations</td><td>"Which VMs are underutilized?"</td></tr>
+  </table>
+
+  <h4>Tags for Cost Management</h4>
+  <ul>
+    <li>Tags are <strong>name-value pairs</strong> you attach to resources (e.g., <code>Department: Marketing</code>)</li>
+    <li>Use tags to group costs by department, project, environment, etc.</li>
+    <li>Tags are <strong>NOT inherited</strong> from resource groups by default &mdash; use Azure Policy to enforce inheritance</li>
+    <li>Azure Cost Management can filter and report costs by tag</li>
+  </ul>
+
+  <div class="tip">Know when to use each calculator: Pricing Calculator = estimate future costs. TCO Calculator = compare on-premises vs cloud. Cost Management = analyze current spending.</div>
+</div>
+
+<!-- GOVERNANCE -->
+<div class="topic" id="governance">
+  <h3>Governance and Compliance</h3>
+
+  <h4>Azure Policy</h4>
+  <p>Create and enforce rules for your Azure resources at scale.</p>
+  <ul>
+    <li><strong>What it does:</strong> Evaluates resources and flags or prevents those that don't comply with your rules</li>
+    <li><strong>Policy effects:</strong></li>
+    <ul>
+      <li><strong>Audit</strong> &mdash; Logs non-compliance but doesn't prevent it</li>
+      <li><strong>Deny</strong> &mdash; Prevents the creation of non-compliant resources</li>
+      <li><strong>Modify</strong> &mdash; Automatically adds or changes properties (like tags)</li>
+      <li><strong>DeployIfNotExists</strong> &mdash; Deploys a required resource if it doesn't exist</li>
+    </ul>
+    <li><strong>Policy Initiative</strong> = A group of related policies bundled together (e.g., "Security Baseline")</li>
+    <li>Policies can be applied at Management Group, Subscription, or Resource Group level</li>
+  </ul>
+
+  <div class="key-term"><strong>Azure Policy vs RBAC:</strong> Policy controls <em>what</em> resources can do (properties, locations, types). RBAC controls <em>who</em> can do things to resources (user permissions). They work together but are different systems.</div>
+
+  <h4>Resource Locks</h4>
+  <p>Prevent accidental deletion or modification of critical resources.</p>
+  <table class="compare-table">
+    <tr><th>Lock Type</th><th>Can Read?</th><th>Can Modify?</th><th>Can Delete?</th></tr>
+    <tr><td><strong>CanNotDelete</strong></td><td class="check">Yes</td><td class="check">Yes</td><td class="cross">No</td></tr>
+    <tr><td><strong>ReadOnly</strong></td><td class="check">Yes</td><td class="cross">No</td><td class="cross">No</td></tr>
+  </table>
+  <p>Locks apply <strong>regardless of RBAC permissions</strong> &mdash; even Owners must remove the lock first before deleting.</p>
+
+  <h4>Azure Blueprints</h4>
+  <ul>
+    <li>Define a <strong>repeatable package</strong> of: ARM templates + Policy assignments + RBAC assignments + Resource Groups</li>
+    <li>Unlike ARM templates, Blueprints <strong>maintain an active connection</strong> to what was deployed</li>
+    <li>Versioned, auditable, and trackable</li>
+    <li>Great for setting up new environments that must meet standards</li>
+  </ul>
+
+  <h4>Compliance Tools</h4>
+  <ul>
+    <li><strong>Microsoft Service Trust Portal</strong> &mdash; Access audit reports, compliance guides, and trust documents about Microsoft cloud services</li>
+    <li><strong>Microsoft Purview</strong> &mdash; Unified data governance: data catalog, data lineage, compliance management, risk management across your entire data estate</li>
+  </ul>
+
+  <div class="tip">Policy = what resources can do. RBAC = who can do things. Locks = prevent accidental changes even by owners. Blueprints = repeatable compliant environments.</div>
+</div>
+
+<!-- DEPLOYMENT TOOLS -->
+<div class="topic" id="deployment-tools">
+  <h3>Deployment and Management Tools</h3>
+
+  <h4>Management Interfaces</h4>
+  <table class="compare-table">
+    <tr><th>Tool</th><th>Type</th><th>Best For</th></tr>
+    <tr><td><strong>Azure Portal</strong></td><td>Web-based GUI</td><td>Visual management, one-time tasks, learning</td></tr>
+    <tr><td><strong>Azure Cloud Shell</strong></td><td>Browser-based terminal (Bash or PowerShell)</td><td>Quick CLI access from anywhere; no local install needed</td></tr>
+    <tr><td><strong>Azure PowerShell</strong></td><td>PowerShell cmdlets</td><td>Windows admins, scripting automation</td></tr>
+    <tr><td><strong>Azure CLI</strong></td><td>Cross-platform command-line (az commands)</td><td>Cross-platform scripting, automation</td></tr>
+    <tr><td><strong>Azure Mobile App</strong></td><td>Mobile app</td><td>Monitor and manage on the go</td></tr>
+  </table>
+
+  <h4>Infrastructure as Code (IaC)</h4>
+  <p>Managing infrastructure through code files instead of manual processes. Benefits: repeatable, version-controlled, consistent, automatable.</p>
+
+  <table class="compare-table">
+    <tr><th>Tool</th><th>Format</th><th>Key Feature</th></tr>
+    <tr><td><strong>ARM Templates</strong></td><td>JSON</td><td>Native Azure IaC; declarative; idempotent deployments</td></tr>
+    <tr><td><strong>Bicep</strong></td><td>DSL (compiles to ARM JSON)</td><td>Simpler syntax than ARM JSON; recommended approach; same capabilities</td></tr>
+    <tr><td><strong>Terraform</strong></td><td>HCL</td><td>Multi-cloud IaC (not Azure-specific)</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Idempotent</strong> = Deploying the same template multiple times gives the same result every time. It won't create duplicate resources.</div>
+
+  <h4>Azure Arc</h4>
+  <p>Extends Azure management to resources <strong>outside of Azure</strong> (on-premises servers, other clouds).</p>
+  <ul>
+    <li>Manage non-Azure servers, Kubernetes clusters, and data services using Azure tools</li>
+    <li>Apply Azure Policy, RBAC, and monitoring to external resources</li>
+    <li>Provides a <strong>single pane of glass</strong> for hybrid and multi-cloud management</li>
+  </ul>
+
+  <div class="tip">Azure Arc = manage resources outside Azure with Azure tools. ARM/Bicep = define Azure resources as code. The portal = visual one-off management.</div>
+</div>
+
+<!-- MONITORING -->
+<div class="topic" id="monitoring">
+  <h3>Monitoring Tools</h3>
+
+  <h4>Azure Monitor</h4>
+  <p>The central platform for <strong>collecting, analyzing, and acting on telemetry</strong> from your Azure and on-premises resources.</p>
+  <ul>
+    <li>Collects <strong>Metrics</strong> (numeric performance data) and <strong>Logs</strong> (detailed records of events)</li>
+    <li>Powers alerts, dashboards, and automated actions</li>
+  </ul>
+
+  <h4>Key Monitoring Components</h4>
+  <table class="compare-table">
+    <tr><th>Tool</th><th>Part Of</th><th>What It Does</th></tr>
+    <tr><td><strong>Log Analytics</strong></td><td>Azure Monitor</td><td>Write and run queries (KQL) against collected log data</td></tr>
+    <tr><td><strong>Azure Monitor Alerts</strong></td><td>Azure Monitor</td><td>Automated notifications when conditions match rules (email, SMS, webhooks)</td></tr>
+    <tr><td><strong>Application Insights</strong></td><td>Azure Monitor</td><td>Application Performance Management (APM) — monitor live web apps, detect anomalies, track requests/failures</td></tr>
+  </table>
+
+  <h4>Azure Advisor</h4>
+  <p>A personalized cloud consultant that analyzes your deployed resources and provides recommendations in <strong>five categories</strong>:</p>
+  <ol>
+    <li><strong>Reliability</strong> &mdash; Improve continuity and availability</li>
+    <li><strong>Security</strong> &mdash; Detect threats and vulnerabilities</li>
+    <li><strong>Performance</strong> &mdash; Improve speed and responsiveness</li>
+    <li><strong>Operational Excellence</strong> &mdash; Improve processes and workflows</li>
+    <li><strong>Cost</strong> &mdash; Optimize and reduce spending</li>
+  </ol>
+
+  <h4>Azure Service Health</h4>
+  <p>Three components showing the health of Azure services:</p>
+  <table class="compare-table">
+    <tr><th>Component</th><th>Scope</th><th>Shows</th></tr>
+    <tr><td><strong>Azure Status</strong></td><td>Global</td><td>Overall Azure health across all regions</td></tr>
+    <tr><td><strong>Service Health</strong></td><td>Your services</td><td>Issues and maintenance affecting services YOU use in regions YOU use</td></tr>
+    <tr><td><strong>Resource Health</strong></td><td>Individual resources</td><td>Health of specific resources (e.g., is my VM healthy?)</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Azure Monitor</strong> = collect and analyze data. <strong>Azure Advisor</strong> = personalized recommendations. <strong>Azure Service Health</strong> = Azure platform status.</div>
+
+  <div class="tip">Know the difference: Monitor watches YOUR resources. Service Health watches AZURE's status. Advisor gives RECOMMENDATIONS.</div>
+</div>
+
+<!-- SLA -->
+<div class="topic" id="sla">
+  <h3>SLAs and Service Lifecycle</h3>
+
+  <h4>Azure Service Level Agreements (SLAs)</h4>
+  <p>SLAs are formal documents describing Microsoft's uptime commitments for each Azure service.</p>
+
+  <table class="compare-table">
+    <tr><th>SLA</th><th>Allowed Downtime/Year</th><th>Allowed Downtime/Month</th></tr>
+    <tr><td>99%</td><td>~3.65 days</td><td>~7.2 hours</td></tr>
+    <tr><td>99.9%</td><td>~8.7 hours</td><td>~43 minutes</td></tr>
+    <tr><td>99.95%</td><td>~4.4 hours</td><td>~22 minutes</td></tr>
+    <tr><td>99.99%</td><td>~52 minutes</td><td>~4.3 minutes</td></tr>
+    <tr><td>99.999%</td><td>~5.3 minutes</td><td>~26 seconds</td></tr>
+  </table>
+
+  <h4>Composite SLAs</h4>
+  <p>When your app depends on multiple services, you <strong>multiply</strong> the individual SLAs:</p>
+  <p style="text-align:center;font-size:1.1rem;margin:10px 0;"><strong>App Service (99.95%) &times; SQL DB (99.99%) = 99.94%</strong></p>
+  <p>The composite SLA is <strong>always lower</strong> than the individual SLAs. More dependencies = lower overall SLA.</p>
+
+  <h4>How to Improve Your SLA</h4>
+  <ul>
+    <li><strong>Availability Zones</strong> &mdash; Deploy across multiple zones in a region</li>
+    <li><strong>Multiple regions</strong> &mdash; Deploy to more than one region</li>
+    <li><strong>Redundancy / Fallback</strong> &mdash; Add a queue or cache as fallback if a service is unavailable</li>
+    <li><strong>Choose higher-SLA services</strong> &mdash; Some tiers have better SLAs</li>
+  </ul>
+
+  <h4>If Azure Fails the SLA</h4>
+  <p>You may be eligible for <strong>service credits</strong> &mdash; a percentage of your monthly fees. You typically must file a claim.</p>
+
+  <h4>Azure Service Lifecycle</h4>
+  <ul>
+    <li><strong>Preview</strong> &mdash; Service is available for testing but NOT covered by SLAs or support. Two types:</li>
+    <ul>
+      <li><strong>Private Preview</strong> &mdash; Available to select customers by request</li>
+      <li><strong>Public Preview</strong> &mdash; Available to all Azure customers</li>
+    </ul>
+    <li><strong>General Availability (GA)</strong> &mdash; Service is fully released, covered by SLAs and support</li>
+  </ul>
+
+  <div class="key-term"><strong>Azure free account</strong> includes: $200 credit for 30 days + 12 months of popular free services + 25+ always-free services.</div>
+
+  <h4>Frameworks &amp; Best Practices</h4>
+  <ul>
+    <li><strong>Cloud Adoption Framework (CAF)</strong> &mdash; Microsoft's end-to-end guidance for cloud adoption: Strategy &rarr; Plan &rarr; Ready &rarr; Adopt (Migrate/Innovate) &rarr; Govern &rarr; Manage</li>
+    <li><strong>Well-Architected Framework</strong> &mdash; Five pillars for high-quality workloads: Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency</li>
+  </ul>
+
+  <div class="tip">For composite SLAs: multiply. For improving SLAs: add redundancy. Preview services have NO SLA. The five Well-Architected Framework pillars match the five Advisor categories.</div>
+</div>
+
+<!-- FINAL CHECKLIST -->
+<div class="topic" id="checklist" style="margin-top:40px;">
+  <h3>Pre-Exam Checklist</h3>
+  <p>Review each item before taking the exam. Click each to mark as reviewed.</p>
+  <ul class="checklist" id="checklistItems">
+    <li onclick="this.classList.toggle('done')">I can define cloud computing and list its 5 characteristics</li>
+    <li onclick="this.classList.toggle('done')">I understand the shared responsibility model for IaaS, PaaS, and SaaS</li>
+    <li onclick="this.classList.toggle('done')">I can compare public, private, and hybrid cloud</li>
+    <li onclick="this.classList.toggle('done')">I can explain all cloud benefits (HA, scalability, elasticity, reliability, etc.)</li>
+    <li onclick="this.classList.toggle('done')">I know the difference between CapEx and OpEx</li>
+    <li onclick="this.classList.toggle('done')">I can match Azure services to IaaS/PaaS/SaaS</li>
+    <li onclick="this.classList.toggle('done')">I know the Azure hierarchy: Management Groups &gt; Subscriptions &gt; Resource Groups &gt; Resources</li>
+    <li onclick="this.classList.toggle('done')">I understand Regions, Region Pairs, Availability Zones, and Sovereign Regions</li>
+    <li onclick="this.classList.toggle('done')">I can describe all compute services (VMs, Scale Sets, App Service, Functions, ACI, AKS, Virtual Desktop)</li>
+    <li onclick="this.classList.toggle('done')">I know all networking services and the difference between VPN Gateway and ExpressRoute</li>
+    <li onclick="this.classList.toggle('done')">I understand storage types, access tiers (Hot/Cool/Archive), and redundancy options (LRS/ZRS/GRS/GZRS)</li>
+    <li onclick="this.classList.toggle('done')">I can compare Azure SQL, Cosmos DB, and other database services</li>
+    <li onclick="this.classList.toggle('done')">I understand Entra ID, SSO, MFA, Conditional Access, and RBAC</li>
+    <li onclick="this.classList.toggle('done')">I know Zero Trust (3 principles) and Defense in Depth (7 layers)</li>
+    <li onclick="this.classList.toggle('done')">I can describe security services: Defender, Key Vault, DDoS Protection, Firewall, NSGs, Bastion, Sentinel</li>
+    <li onclick="this.classList.toggle('done')">I know the 3 cost calculators and when to use each</li>
+    <li onclick="this.classList.toggle('done')">I understand Azure Policy, Resource Locks, and Blueprints</li>
+    <li onclick="this.classList.toggle('done')">I can describe all management tools: Portal, Cloud Shell, PowerShell, CLI, Arc</li>
+    <li onclick="this.classList.toggle('done')">I understand IaC with ARM templates and Bicep</li>
+    <li onclick="this.classList.toggle('done')">I know Azure Monitor, Log Analytics, Alerts, Application Insights, Advisor, and Service Health</li>
+    <li onclick="this.classList.toggle('done')">I understand SLAs, composite SLAs, and service lifecycle (Preview vs GA)</li>
+  </ul>
+</div>
+
+<div style="text-align:center;margin:40px 0;padding:24px;background:var(--primary-light);border-radius:10px;">
+  <p style="font-size:1.1rem;font-weight:600;margin-bottom:12px;">Ready to test your knowledge?</p>
+  <a href="index.html" class="btn btn-primary" style="text-decoration:none;display:inline-block;">Take the Quiz &rarr;</a>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Sidebar active state & reading progress
+const sections = document.querySelectorAll('.topic, .domain-header');
+const links = document.querySelectorAll('.sidebar a[href^="#"]');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+
+function updateSidebar() {
+  const scrollY = window.scrollY + 100;
+  let current = '';
+  sections.forEach(s => {
+    if (s.offsetTop <= scrollY) current = s.id;
+  });
+  links.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+  // Progress
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, Math.round((window.scrollY / docHeight) * 100));
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `Reading progress: ${pct}%`;
+}
+
+window.addEventListener('scroll', updateSidebar);
+updateSidebar();
+
+// Close sidebar on mobile after clicking link
+links.forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 800) {
+      document.querySelector('.sidebar').classList.remove('open');
+    }
+  });
+});
+</script>
+</body>
+</html>

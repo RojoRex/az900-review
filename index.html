@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZ-900 Review Quiz</title>
+  <style>
+    :root {
+      --primary: #0078d4;
+      --primary-dark: #005a9e;
+      --success: #107c10;
+      --danger: #d13438;
+      --warning: #ffb900;
+      --bg: #f3f2f1;
+      --card: #ffffff;
+      --text: #323130;
+      --text-light: #605e5c;
+      --border: #edebe9;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 24px 32px;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.8rem; font-weight: 600; }
+    .header p { opacity: 0.9; margin-top: 6px; font-size: 0.95rem; }
+    .container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+    .landing { text-align: center; }
+    .landing h2 { font-size: 1.4rem; margin-bottom: 16px; }
+    .domain-cards { display: grid; gap: 14px; margin: 24px 0; }
+    .domain-card {
+      background: var(--card); border-radius: var(--radius); padding: 20px;
+      text-align: left; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .domain-card h3 { font-size: 1rem; color: var(--primary); margin-bottom: 4px; }
+    .domain-card p { font-size: 0.85rem; color: var(--text-light); }
+    .domain-card .weight {
+      display: inline-block; background: #e8f4fd; color: var(--primary);
+      font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-bottom: 8px;
+    }
+    .btn {
+      display: inline-block; padding: 12px 32px; border-radius: var(--radius);
+      font-size: 1rem; font-weight: 600; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-outline:hover { background: #e8f4fd; }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .mode-selector { margin: 24px 0; }
+    .mode-selector label {
+      display: block; background: var(--card); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 16px 20px; margin-bottom: 10px;
+      cursor: pointer; transition: border-color 0.2s; text-align: left;
+    }
+    .mode-selector label:hover { border-color: var(--primary); }
+    .mode-selector input:checked + label,
+    .mode-selector label:has(input:checked) { border-color: var(--primary); background: #e8f4fd; }
+    .mode-selector input { display: none; }
+    .mode-label { font-weight: 600; }
+    .mode-desc { font-size: 0.85rem; color: var(--text-light); margin-top: 2px; }
+    .progress-bar-wrap {
+      background: var(--border); border-radius: 6px; height: 8px;
+      margin-bottom: 20px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%; background: var(--primary); border-radius: 6px; transition: width 0.4s ease;
+    }
+    .quiz-meta {
+      display: flex; justify-content: space-between; font-size: 0.85rem;
+      color: var(--text-light); margin-bottom: 12px;
+    }
+    .domain-badge {
+      display: inline-block; background: #e8f4fd; color: var(--primary);
+      font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; margin-bottom: 12px;
+    }
+    .question-card {
+      background: var(--card); border-radius: var(--radius); padding: 28px;
+      border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .question-card h3 { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; }
+    .options { display: grid; gap: 10px; }
+    .option {
+      display: block; width: 100%; text-align: left; padding: 14px 18px;
+      border: 2px solid var(--border); border-radius: 8px; background: var(--card);
+      font-size: 0.95rem; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .option:hover:not(.disabled) { border-color: var(--primary); background: #f5faff; }
+    .option.selected { border-color: var(--primary); background: #e8f4fd; }
+    .option.correct { border-color: var(--success); background: #dff6dd; }
+    .option.incorrect { border-color: var(--danger); background: #fde7e9; }
+    .option.disabled { cursor: default; opacity: 0.85; }
+    .option.disabled.show-correct { border-color: var(--success); background: #dff6dd; opacity: 1; }
+    .explanation {
+      margin-top: 18px; padding: 16px; border-radius: 8px;
+      background: #f9f9f9; border-left: 4px solid var(--primary);
+      font-size: 0.9rem; line-height: 1.6; animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .quiz-nav { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .results { text-align: center; }
+    .score-circle {
+      width: 160px; height: 160px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 20px auto; font-size: 2.4rem; font-weight: 700; border: 6px solid;
+    }
+    .score-circle.pass { border-color: var(--success); color: var(--success); }
+    .score-circle.fail { border-color: var(--danger); color: var(--danger); }
+    .score-circle small { font-size: 0.85rem; font-weight: 400; color: var(--text-light); }
+    .score-label { font-size: 1.1rem; font-weight: 600; margin: 8px 0 20px; }
+    .domain-results { text-align: left; margin: 24px 0; }
+    .domain-result {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 18px; margin-bottom: 10px;
+    }
+    .domain-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .domain-result-header span:first-child { font-weight: 600; font-size: 0.9rem; }
+    .domain-result-header span:last-child { font-size: 0.85rem; color: var(--text-light); }
+    .mini-bar { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; }
+    .mini-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+    .review-list { text-align: left; margin: 24px 0; }
+    .review-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 18px; margin-bottom: 12px;
+    }
+    .review-item .ri-status { font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; }
+    .review-item .ri-status.correct { color: var(--success); }
+    .review-item .ri-status.incorrect { color: var(--danger); }
+    .review-item .ri-q { font-weight: 600; margin-bottom: 6px; }
+    .review-item .ri-a { font-size: 0.9rem; color: var(--text-light); }
+    .hidden { display: none !important; }
+    .q-count-selector { margin: 16px 0; text-align: center; }
+    .q-count-selector label { font-weight: 600; margin-right: 8px; }
+    .q-count-selector select {
+      padding: 8px 16px; border-radius: 6px; border: 2px solid var(--border);
+      font-size: 0.95rem; cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.3rem; }
+      .question-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>AZ-900 Azure Fundamentals</h1>
+  <p>Comprehensive Certification Review &mdash; 200+ Questions</p>
+</div>
+<div class="container">
+  <!-- LANDING -->
+  <div id="landing" class="landing">
+    <h2>Choose your review mode</h2>
+    <div class="domain-cards">
+      <div class="domain-card">
+        <span class="weight">25 &ndash; 30%</span>
+        <h3>Domain 1: Cloud Concepts</h3>
+        <p>Cloud computing definition, shared responsibility, cloud models (public/private/hybrid), benefits of cloud, IaaS, PaaS, SaaS</p>
+      </div>
+      <div class="domain-card">
+        <span class="weight">35 &ndash; 40%</span>
+        <h3>Domain 2: Azure Architecture &amp; Services</h3>
+        <p>Regions, availability zones, resource groups, subscriptions, compute, networking, storage, identity, security, databases, IoT, AI, DevOps</p>
+      </div>
+      <div class="domain-card">
+        <span class="weight">30 &ndash; 35%</span>
+        <h3>Domain 3: Azure Management &amp; Governance</h3>
+        <p>Cost management, pricing calculators, governance, compliance, policy, locks, Blueprints, ARM/Bicep, Arc, monitoring, Advisor, Service Health</p>
+      </div>
+    </div>
+    <div class="mode-selector">
+      <input type="radio" name="mode" id="modeAll" value="all" checked>
+      <label for="modeAll" onclick="document.getElementById('modeAll').checked=true">
+        <div class="mode-label">All Questions (200+)</div>
+        <div class="mode-desc">Every question in the bank, randomized</div>
+      </label>
+      <input type="radio" name="mode" id="modeExam" value="exam">
+      <label for="modeExam" onclick="document.getElementById('modeExam').checked=true">
+        <div class="mode-label">Exam Simulation (50 questions)</div>
+        <div class="mode-desc">Weighted mix across all domains like the real exam</div>
+      </label>
+      <input type="radio" name="mode" id="modeQuick" value="quick">
+      <label for="modeQuick" onclick="document.getElementById('modeQuick').checked=true">
+        <div class="mode-label">Quick Review (25 questions)</div>
+        <div class="mode-desc">Shorter random mix across all domains</div>
+      </label>
+      <input type="radio" name="mode" id="mode1" value="domain1">
+      <label for="mode1" onclick="document.getElementById('mode1').checked=true">
+        <div class="mode-label">Domain 1 Only &mdash; Cloud Concepts</div>
+        <div class="mode-desc">Cloud models, benefits, service types (IaaS/PaaS/SaaS)</div>
+      </label>
+      <input type="radio" name="mode" id="mode2" value="domain2">
+      <label for="mode2" onclick="document.getElementById('mode2').checked=true">
+        <div class="mode-label">Domain 2 Only &mdash; Architecture &amp; Services</div>
+        <div class="mode-desc">Core components, compute, networking, storage, identity, security</div>
+      </label>
+      <input type="radio" name="mode" id="mode3" value="domain3">
+      <label for="mode3" onclick="document.getElementById('mode3').checked=true">
+        <div class="mode-label">Domain 3 Only &mdash; Management &amp; Governance</div>
+        <div class="mode-desc">Cost, governance, compliance, deployment, monitoring</div>
+      </label>
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()">Start Review</button>
+  </div>
+  <!-- QUIZ -->
+  <div id="quiz" class="hidden">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="quiz-meta">
+      <span id="qCounter">Question 1 / 50</span>
+      <span id="qScore">Score: 0</span>
+    </div>
+    <div class="question-card">
+      <span class="domain-badge" id="qDomain"></span>
+      <h3 id="qText"></h3>
+      <div class="options" id="qOptions"></div>
+      <div class="explanation hidden" id="qExplanation"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Next &rarr;</button>
+    </div>
+  </div>
+  <!-- RESULTS -->
+  <div id="results" class="hidden results"></div>
+</div>
+
+<script>
+const Q=[
+// ===========================
+// DOMAIN 1 — CLOUD CONCEPTS
+// ===========================
+
+// -- What is cloud computing --
+{d:"Cloud Concepts",q:"What is cloud computing?",o:["Storing files on a USB drive","The delivery of computing services over the internet","Running software on a local desktop","Using a LAN for file sharing"],a:1,e:"Cloud computing is the delivery of computing services—including servers, storage, databases, networking, software, analytics, and intelligence—over the internet ('the cloud') to offer faster innovation, flexible resources, and economies of scale."},
+{d:"Cloud Concepts",q:"Which of the following is NOT a characteristic of cloud computing?",o:["On-demand self-service","Broad network access","Dedicated single-tenant hardware for all customers","Rapid elasticity"],a:2,e:"Cloud computing is typically multi-tenant with shared infrastructure. The five essential characteristics (per NIST) are: on-demand self-service, broad network access, resource pooling, rapid elasticity, and measured service."},
+{d:"Cloud Concepts",q:"What does 'measured service' mean in cloud computing?",o:["You get a physical meter for electricity","Resource usage is monitored, controlled, and reported for transparency","Services are measured in kilograms","You must measure your bandwidth manually"],a:1,e:"Measured service means cloud systems automatically control and optimize resource use by leveraging metering capability. Usage can be monitored, controlled, and reported, providing transparency for both the provider and consumer."},
+
+// -- Shared responsibility model --
+{d:"Cloud Concepts",q:"What is the shared responsibility model in cloud computing?",o:["The cloud provider is responsible for everything","The customer is responsible for everything","Responsibilities are divided between the cloud provider and the customer","The government regulates all cloud responsibilities"],a:2,e:"In the shared responsibility model, the cloud provider manages infrastructure (physical security, networking, host) while the customer manages their data, identities, and applications. The exact split depends on the service type."},
+{d:"Cloud Concepts",q:"In the shared responsibility model, who is ALWAYS responsible for the data stored in the cloud?",o:["The cloud provider","The customer","Both equally","The government"],a:1,e:"Regardless of the cloud service type (IaaS, PaaS, or SaaS), the customer is always responsible for the data, endpoints, accounts, and access management."},
+{d:"Cloud Concepts",q:"In the shared responsibility model for IaaS, who is responsible for the operating system?",o:["The cloud provider","The customer","Shared equally","Neither"],a:1,e:"With IaaS, the customer is responsible for the operating system, applications, runtime, and data. The provider manages the physical hardware, networking, and virtualization layer."},
+{d:"Cloud Concepts",q:"In SaaS, which of the following is the customer responsible for?",o:["The operating system","The physical servers","Data and user access","The networking infrastructure"],a:2,e:"In SaaS, the provider manages nearly everything — infrastructure, platform, and application. The customer is still responsible for their data, user accounts, devices, and access management."},
+{d:"Cloud Concepts",q:"Who is responsible for physical security of the datacenter in all cloud service types?",o:["The customer","The cloud provider","Both","A third-party company"],a:1,e:"Physical datacenter security (building access, power, cooling, physical hardware) is always the responsibility of the cloud provider, regardless of whether you use IaaS, PaaS, or SaaS."},
+
+// -- Cloud models --
+{d:"Cloud Concepts",q:"Which cloud deployment model uses only public cloud resources?",o:["Hybrid cloud","Private cloud","Public cloud","On-premises"],a:2,e:"A public cloud deployment uses resources owned and operated by a third-party cloud service provider delivered over the internet. All hardware, software, and supporting infrastructure is owned and managed by the provider."},
+{d:"Cloud Concepts",q:"What is a key characteristic of a public cloud?",o:["Hardware is owned by the organization using it","Resources are shared among multiple organizations","Only one organization can use the infrastructure","Requires on-premises datacenters"],a:1,e:"In a public cloud, the infrastructure is owned by the cloud provider and shared (multi-tenant) among multiple organizations. You access resources over the internet."},
+{d:"Cloud Concepts",q:"Which cloud deployment model combines on-premises and public cloud resources?",o:["Public cloud","Private cloud","Hybrid cloud","Community cloud"],a:2,e:"A hybrid cloud combines on-premises infrastructure (or private cloud) with public cloud services, allowing data and applications to move between them for greater flexibility."},
+{d:"Cloud Concepts",q:"Which is a characteristic of a private cloud?",o:["Shared infrastructure across many organizations","Lowest possible cost","Dedicated infrastructure for a single organization","No maintenance required"],a:2,e:"A private cloud is dedicated to a single organization. It can be hosted on-premises or by a third party, offering more control and privacy but at higher cost."},
+{d:"Cloud Concepts",q:"An organization wants to keep sensitive data on-premises while using the public cloud for less-sensitive workloads. Which cloud model fits?",o:["Public cloud only","Private cloud only","Hybrid cloud","Community cloud"],a:2,e:"Hybrid cloud is ideal when an organization needs to keep certain data/apps on-premises (for compliance or security) while leveraging the public cloud for other workloads."},
+{d:"Cloud Concepts",q:"Which cloud model offers the MOST scalability?",o:["Private cloud","Public cloud","On-premises","Community cloud"],a:1,e:"Public cloud offers the most scalability because the cloud provider has massive pools of resources that can be allocated on demand, far exceeding what most private clouds can offer."},
+{d:"Cloud Concepts",q:"What is a multi-cloud approach?",o:["Using a single cloud provider for everything","Using multiple public cloud providers simultaneously","Running private clouds in multiple locations","Using the cloud only for backup"],a:1,e:"Multi-cloud means using cloud services from more than one public cloud provider (e.g., Azure + AWS). Organizations do this to avoid vendor lock-in, leverage best-of-breed services, or meet regulatory requirements."},
+
+// -- Benefits of cloud --
+{d:"Cloud Concepts",q:"What does 'high availability' mean in cloud computing?",o:["Resources are available in every country","Services remain available with minimal downtime despite failures","All data is backed up hourly","Costs are always low"],a:1,e:"High availability means systems are designed to remain operational and accessible even when components fail, typically measured by uptime SLAs (e.g., 99.9% or 99.99%)."},
+{d:"Cloud Concepts",q:"What does 'scalability' refer to in cloud computing?",o:["The ability to recover from disasters","The ability to add or remove resources to handle changes in demand","The ability to reduce security threats","The ability to lower costs automatically"],a:1,e:"Scalability is the ability to increase or decrease capacity (compute, storage, network) to handle changing workloads. It can be vertical (bigger machines) or horizontal (more machines)."},
+{d:"Cloud Concepts",q:"What is the difference between vertical and horizontal scaling?",o:["Vertical adds more VMs; horizontal adds more CPU to one VM","Vertical adds more CPU/RAM to one VM; horizontal adds more VMs","They are the same thing","Vertical is for storage; horizontal is for compute only"],a:1,e:"Vertical scaling (scale up) means increasing resources (CPU, RAM) on an existing VM. Horizontal scaling (scale out) means adding more VM instances to distribute the load."},
+{d:"Cloud Concepts",q:"What does 'elasticity' mean in cloud computing?",o:["Data is always encrypted","Resources can be automatically scaled up or down based on demand","Applications never go down","Costs are always predictable"],a:1,e:"Elasticity is the ability to automatically and quickly scale resources up during demand spikes and scale down when demand decreases, ensuring you only pay for what you need at any given time."},
+{d:"Cloud Concepts",q:"What does 'reliability' mean as a cloud benefit?",o:["Cloud services never fail","Cloud systems can recover from failures and continue to function","All data is automatically encrypted","There is no single point of failure ever"],a:1,e:"Reliability is the ability of a system to recover from failures and continue to function. The cloud's decentralized design supports a reliable infrastructure with resources deployed in regions around the world."},
+{d:"Cloud Concepts",q:"What does 'predictability' in the cloud refer to?",o:["You always know exact costs in advance","Performance predictability and cost predictability enabled by cloud frameworks","Weather prediction using cloud data","Network speeds never change"],a:1,e:"Predictability in the cloud covers both performance (autoscaling, load balancing, high availability ensure consistent experience) and cost (tracking and forecasting resource usage to optimize spending)."},
+{d:"Cloud Concepts",q:"How does cloud computing improve security?",o:["By eliminating all security threats","By providing tools and features for security, with cloud providers investing heavily in security infrastructure","By removing the need for any customer security measures","By making all data public for transparency"],a:1,e:"Cloud providers invest heavily in security infrastructure, offer security tools (firewalls, identity management, encryption), and apply patches. However, security remains a shared responsibility — customers must still secure their data and identities."},
+{d:"Cloud Concepts",q:"What does 'governance' mean as a cloud benefit?",o:["Government agencies manage the cloud","Standards, policies, and auditing help ensure resources comply with corporate or regulatory requirements","All cloud usage must be approved by a board","Resources are automatically deleted after 30 days"],a:1,e:"Cloud governance includes features like templates, policies, and auditing that ensure deployed resources meet corporate standards and regulatory requirements. Established policies can be automatically enforced."},
+{d:"Cloud Concepts",q:"What does 'manageability' mean in the context of cloud benefits?",o:["Only managers can access the cloud","The cloud can be managed through multiple interfaces and supports automation","Resources manage themselves with zero input","All management requires on-premises hardware"],a:1,e:"Manageability in cloud means two things: management OF the cloud (auto-scaling, template-based deployment, monitoring) and management IN the cloud (portal, CLI, APIs, PowerShell). Both make operations easier."},
+{d:"Cloud Concepts",q:"Which is a benefit of cloud computing related to cost?",o:["Unlimited free storage","Shifting from CapEx to OpEx with consumption-based pricing","All cloud services are free","Fixed monthly costs regardless of usage"],a:1,e:"Cloud computing shifts from capital expenditure (buying hardware upfront) to operational expenditure (paying for services as you use them), enabling consumption-based pricing with no upfront investment."},
+{d:"Cloud Concepts",q:"What is consumption-based pricing?",o:["Paying a fixed monthly fee regardless of usage","Paying only for the cloud resources you actually use","Getting a discount for long-term contracts","Free usage for the first year"],a:1,e:"Consumption-based pricing means you pay only for the cloud resources you actually consume. There are no upfront costs for unused capacity, and you can stop paying when you stop using resources."},
+{d:"Cloud Concepts",q:"What does 'fault tolerance' mean in cloud computing?",o:["A system that never has bugs","The ability of a system to continue operating when a component fails","A method of reducing cloud costs","A type of security feature"],a:1,e:"Fault tolerance ensures a system continues functioning even when individual components fail, typically through redundancy, replication, and failover mechanisms built into cloud infrastructure."},
+{d:"Cloud Concepts",q:"What does 'disaster recovery' provide in cloud computing?",o:["Prevents all disasters from occurring","The ability to recover from a major event that causes service loss","Free insurance for data loss","Automatic code debugging"],a:1,e:"Disaster recovery capabilities in the cloud allow you to replicate data and applications to secondary regions so services can be restored quickly after a catastrophic event like a natural disaster or regional outage."},
+{d:"Cloud Concepts",q:"What does 'agility' mean as a cloud benefit?",o:["Applications run faster","Resources can be deployed and configured quickly","Network latency is eliminated","Costs are always reduced"],a:1,e:"Agility in cloud computing means the ability to rapidly provision, configure, and deploy resources, enabling faster development cycles and quicker response to changing business needs."},
+{d:"Cloud Concepts",q:"Which pricing model requires large upfront investments in hardware?",o:["Operational Expenditure (OpEx)","Capital Expenditure (CapEx)","Pay-as-you-go","Consumption-based"],a:1,e:"Capital Expenditure (CapEx) involves buying physical infrastructure upfront. The cost is deducted from your bill over time. Cloud computing shifts this to OpEx where you pay for services as you use them."},
+{d:"Cloud Concepts",q:"What is Operational Expenditure (OpEx)?",o:["Buying physical servers and datacenter equipment","Spending money on services and products now and being billed as you use them","A one-time payment for a software license","Purchasing real estate for a datacenter"],a:1,e:"OpEx is spending on products and services as needed, paying as you go. Cloud services are considered OpEx because you pay for resources on a consumption basis with no large upfront costs."},
+{d:"Cloud Concepts",q:"An organization needs to ensure its application stays online even if an entire datacenter fails. Which cloud benefit addresses this?",o:["Agility","Elasticity","High availability","Cost management"],a:2,e:"High availability is the benefit that ensures services remain accessible even when components (including entire datacenters) fail. Availability Zones and geo-redundancy support this."},
+
+// -- Cloud service types --
+{d:"Cloud Concepts",q:"Which cloud service type gives the customer the MOST control over the infrastructure?",o:["SaaS","PaaS","IaaS","Serverless"],a:2,e:"IaaS (Infrastructure as a Service) gives the most control. You manage the OS, runtime, middleware, and applications while the provider manages the physical hardware, networking, and virtualization."},
+{d:"Cloud Concepts",q:"Which cloud service type requires the LEAST customer management?",o:["IaaS","PaaS","SaaS","On-premises"],a:2,e:"SaaS (Software as a Service) requires the least management. The provider handles everything from infrastructure to the application itself. The customer only manages data and user access."},
+{d:"Cloud Concepts",q:"Which cloud service type requires the customer to manage the operating system?",o:["SaaS","PaaS","IaaS","FaaS"],a:2,e:"With IaaS, the cloud provider manages physical hardware and virtualization, but the customer is responsible for the OS, middleware, runtime, applications, and data."},
+{d:"Cloud Concepts",q:"Microsoft 365 (Office 365) is an example of which cloud service type?",o:["IaaS","PaaS","SaaS","DaaS"],a:2,e:"Microsoft 365 is SaaS. Users access fully managed applications like Word, Excel, Teams, and Outlook through the internet without managing any underlying infrastructure or platform."},
+{d:"Cloud Concepts",q:"Azure App Service is an example of which cloud service type?",o:["IaaS","PaaS","SaaS","On-premises"],a:1,e:"Azure App Service is PaaS (Platform as a Service). It provides a managed platform for deploying web applications without managing the underlying servers, OS, or runtime environment."},
+{d:"Cloud Concepts",q:"Azure Virtual Machines is an example of which cloud service type?",o:["IaaS","PaaS","SaaS","Serverless"],a:0,e:"Azure Virtual Machines is IaaS (Infrastructure as a Service). You get virtualized hardware and have full control over the operating system, software, and configuration."},
+{d:"Cloud Concepts",q:"Which cloud service type is best for a 'lift and shift' migration?",o:["SaaS","PaaS","IaaS","Serverless"],a:2,e:"IaaS is ideal for lift-and-shift migrations because you can move existing on-premises VMs to the cloud with minimal changes, maintaining the same OS and application configurations."},
+{d:"Cloud Concepts",q:"A developer wants to deploy a web app without managing servers, OS patches, or infrastructure. Which service type is best?",o:["IaaS","PaaS","On-premises","Bare metal"],a:1,e:"PaaS is designed for developers who want to focus on building applications. The cloud provider manages the infrastructure, OS, middleware, and runtime, while the developer manages the application and data."},
+{d:"Cloud Concepts",q:"Azure SQL Database is an example of which cloud service type?",o:["IaaS","PaaS","SaaS","On-premises"],a:1,e:"Azure SQL Database is PaaS. Microsoft manages the database engine, OS, hardware, patching, and backups. You manage the database schemas, data, queries, and access."},
+{d:"Cloud Concepts",q:"Which scenario best fits SaaS?",o:["Hosting a custom VM with a legacy OS","Building a custom web application on a managed platform","Using a ready-made email service like Outlook Online","Setting up a Kubernetes cluster"],a:2,e:"SaaS provides ready-made software accessed over the internet. Using Outlook Online for email is SaaS — you simply use the application without worrying about servers, storage, or platform management."},
+{d:"Cloud Concepts",q:"In the shared responsibility model, which responsibility shifts the MOST to the provider as you move from IaaS to PaaS to SaaS?",o:["Data classification","Account and identity management","Application management","Endpoint protection"],a:2,e:"As you move from IaaS → PaaS → SaaS, the provider takes on more responsibility. In IaaS you manage apps; in PaaS the provider manages the platform under your app; in SaaS the provider manages the app too. Data and identity remain with the customer."},
+{d:"Cloud Concepts",q:"Which cloud service type provides a development and deployment environment for building cloud applications?",o:["IaaS","PaaS","SaaS","FaaS"],a:1,e:"PaaS provides a complete development and deployment environment in the cloud, with tools and resources to deliver everything from simple cloud-based apps to sophisticated, cloud-enabled enterprise applications."},
+
+// ===========================
+// DOMAIN 2 — AZURE ARCHITECTURE & SERVICES
+// ===========================
+
+// -- Core architectural components --
+{d:"Azure Architecture & Services",q:"What is an Azure Region?",o:["A single datacenter","A set of datacenters deployed within a latency-defined perimeter connected by a dedicated network","A virtual network","A resource group"],a:1,e:"An Azure Region is a set of datacenters deployed within a latency-defined perimeter and connected through a dedicated low-latency network. Azure has 60+ regions worldwide."},
+{d:"Azure Architecture & Services",q:"What are Azure Region Pairs?",o:["Two VMs in the same region","Two regions within the same geography paired for disaster recovery","Two subscriptions linked together","Two storage accounts replicated"],a:1,e:"Region pairs are two Azure regions within the same geography (e.g., East US and West US) that are directly connected. They provide data residency and allow failover if an entire region fails. Updates are rolled out sequentially to paired regions."},
+{d:"Azure Architecture & Services",q:"What are Azure Sovereign Regions?",o:["Regions for government-only data with extra security","Regions available to any customer","Free-tier-only regions","Regions with no SLA"],a:0,e:"Sovereign regions are isolated instances of Azure separated from the main Azure cloud, used for compliance and legal purposes. Examples include Azure Government (US) and Azure China (operated by 21Vianet)."},
+{d:"Azure Architecture & Services",q:"What is an Availability Zone in Azure?",o:["A region with no downtime","A physically separate datacenter within an Azure region with independent power, cooling, and networking","A virtual machine type","A pricing tier"],a:1,e:"Availability Zones are physically separate locations within an Azure region. Each zone has independent power, cooling, and networking. They protect against datacenter-level failures and offer a 99.99% VM uptime SLA."},
+{d:"Azure Architecture & Services",q:"How many Availability Zones does each supported Azure region have (minimum)?",o:["One","Two","Three","Five"],a:2,e:"Azure regions that support Availability Zones have a minimum of three separate zones. This ensures redundancy and resilience for mission-critical applications."},
+{d:"Azure Architecture & Services",q:"What is an Azure datacenter?",o:["A region","A physical facility with its own power, cooling, and networking that hosts Azure servers","A type of VM","A virtual network"],a:1,e:"An Azure datacenter is a physical facility equipped with independent power, cooling, and networking infrastructure. Multiple datacenters make up a region, and some form Availability Zones within a region."},
+{d:"Azure Architecture & Services",q:"What is the purpose of Azure Resource Groups?",o:["To group users together","To act as logical containers for Azure resources","To create virtual networks","To manage billing accounts"],a:1,e:"Resource Groups are logical containers that hold related Azure resources (VMs, databases, storage). They help organize, manage, apply policies, and control access to resources as a unit."},
+{d:"Azure Architecture & Services",q:"Can a resource belong to multiple Resource Groups?",o:["Yes, up to three","Yes, unlimited","No, a resource can only be in one Resource Group","Only storage accounts can be in multiple groups"],a:2,e:"Each Azure resource can exist in only one Resource Group. However, resources in different Resource Groups can still interact with each other. You can also move resources between groups."},
+{d:"Azure Architecture & Services",q:"What happens to resources when a Resource Group is deleted?",o:["Nothing, resources move to a default group","All resources in the group are also deleted","Resources become unmanaged","Only VMs are deleted"],a:1,e:"Deleting a Resource Group deletes ALL resources within it. This makes Resource Groups useful for managing the lifecycle of related resources, but also means you should be careful when deleting them."},
+{d:"Azure Architecture & Services",q:"What is an Azure Subscription?",o:["A way to receive email from Azure","A unit of management, billing, and scale for Azure resources","A type of virtual machine","A networking component"],a:1,e:"An Azure Subscription is both a billing boundary and an access-control boundary. It provides authenticated and authorized access to Azure products/services and allows you to provision resources."},
+{d:"Azure Architecture & Services",q:"Can an Azure account have multiple subscriptions?",o:["No, only one","Yes, and each can have different billing and access policies","Only enterprise accounts can","Yes, but they share the same billing"],a:1,e:"An Azure account can have multiple subscriptions, each with its own billing configuration and access-control policies. This is useful for separating environments (dev, test, prod) or departments."},
+{d:"Azure Architecture & Services",q:"What is the hierarchy of Azure organizational structure (top to bottom)?",o:["Subscription > Resource Group > Management Group > Resource","Management Group > Subscription > Resource Group > Resource","Resource > Resource Group > Subscription > Management Group","Region > Zone > Resource Group > Resource"],a:1,e:"The hierarchy is: Management Groups (top) > Subscriptions > Resource Groups > Resources (bottom). Policies and RBAC applied at higher levels are inherited by lower levels."},
+{d:"Azure Architecture & Services",q:"What are Management Groups used for?",o:["Managing Azure employee schedules","Organizing subscriptions and applying governance conditions across them","Creating virtual machines","Monitoring resource health"],a:1,e:"Management Groups provide a governance scope above subscriptions. You can organize subscriptions into Management Groups and apply policies or RBAC that are inherited by all child subscriptions and resources."},
+
+// -- Compute services --
+{d:"Azure Architecture & Services",q:"What is Azure Virtual Machines used for?",o:["Only for running Linux workloads","Providing IaaS compute resources — full VMs in the cloud","Managing DNS records","Storing blob data"],a:1,e:"Azure Virtual Machines provide on-demand, scalable IaaS computing. You can run Windows or Linux VMs and have full control over the OS, software, and configuration."},
+{d:"Azure Architecture & Services",q:"What are Azure VM Scale Sets?",o:["Groups of identical, load-balanced VMs that can automatically increase or decrease in number","A way to resize a single VM","A type of storage account","A networking feature"],a:0,e:"VM Scale Sets let you create and manage a group of identical, load-balanced VMs. The number of VM instances can automatically increase or decrease based on demand or a defined schedule."},
+{d:"Azure Architecture & Services",q:"What are Azure Availability Sets?",o:["Groups of VMs deployed across fault domains and update domains for high availability","Types of storage accounts","Virtual network configurations","Pricing plans"],a:0,e:"Availability Sets distribute VMs across multiple fault domains (separate racks with separate power/network) and update domains (groups updated separately during maintenance) to minimize downtime."},
+{d:"Azure Architecture & Services",q:"What is a Fault Domain in an Availability Set?",o:["A group of VMs that share the same network switch and power source","A VM that has crashed","A domain name service","A type of region"],a:0,e:"A Fault Domain represents a group of hardware that shares a common power source and network switch — essentially a server rack. Spreading VMs across fault domains protects against hardware failures."},
+{d:"Azure Architecture & Services",q:"What is an Update Domain in an Availability Set?",o:["A group of VMs that can be rebooted together during planned maintenance","A DNS update service","A software patch management tool","A type of subscription"],a:0,e:"Update Domains are groups of VMs that can be rebooted simultaneously during planned maintenance. Azure ensures only one update domain is rebooted at a time, so your application stays available."},
+{d:"Azure Architecture & Services",q:"Which Azure service is a serverless compute option that runs code in response to events?",o:["Azure Virtual Machines","Azure Functions","Azure Virtual Desktop","Azure Dedicated Host"],a:1,e:"Azure Functions is a serverless compute service that runs event-triggered code without requiring you to manage infrastructure. You only pay for the execution time and resources consumed."},
+{d:"Azure Architecture & Services",q:"What is Azure App Service?",o:["A file storage service","A fully managed PaaS for building, deploying, and scaling web apps","A VM management tool","A DNS service"],a:1,e:"Azure App Service is a PaaS offering for hosting web applications, REST APIs, and mobile backends. It supports .NET, Java, Node.js, Python, PHP, and Ruby with built-in CI/CD, autoscaling, and high availability."},
+{d:"Azure Architecture & Services",q:"What is Azure Container Instances (ACI)?",o:["A VM management tool","The fastest and simplest way to run containers in Azure without managing VMs","A storage service","A DNS service"],a:1,e:"Azure Container Instances offers the simplest way to run containers in Azure without managing VMs or adopting a complex orchestrator. It's ideal for isolated containers, simple applications, and task automation."},
+{d:"Azure Architecture & Services",q:"What is Azure Kubernetes Service (AKS)?",o:["A DNS management service","A managed container orchestration service","A database service","A VPN gateway"],a:1,e:"AKS is a managed Kubernetes service that simplifies deploying, managing, and scaling containerized applications. Azure handles the Kubernetes control plane, health monitoring, and maintenance."},
+{d:"Azure Architecture & Services",q:"Which Azure service provides a managed desktop experience?",o:["Azure Functions","Azure Virtual Desktop","Azure Kubernetes Service","Azure Blob Storage"],a:1,e:"Azure Virtual Desktop is a desktop and app virtualization service running in the cloud. It provides a full Windows desktop experience accessible from anywhere, with multi-session Windows 11 support."},
+{d:"Azure Architecture & Services",q:"What is Azure Dedicated Host?",o:["A shared server for multiple customers","A physical server dedicated to your organization providing hardware isolation","A DNS hosting service","A free-tier VM"],a:1,e:"Azure Dedicated Host provides physical servers dedicated to your organization. No other customer's VMs run on that hardware. It helps meet compliance requirements that mandate physical server isolation."},
+
+// -- Networking services --
+{d:"Azure Architecture & Services",q:"What is Azure Virtual Network (VNet) used for?",o:["Storing files","Enabling Azure resources to communicate with each other, the internet, and on-premises networks","Managing user identities","Running containers"],a:1,e:"Azure VNet is the fundamental building block for private networking in Azure. It enables resources like VMs to securely communicate with each other, the internet, and on-premises networks through an isolated network."},
+{d:"Azure Architecture & Services",q:"What is VNet Peering?",o:["Connecting two VNets so resources in each can communicate with each other","Deleting a VNet","Creating a VNet backup","Encrypting VNet traffic"],a:0,e:"VNet Peering connects two Azure VNets so that traffic between them travels over the Microsoft backbone network, not the public internet. It can connect VNets in the same or different regions (global peering)."},
+{d:"Azure Architecture & Services",q:"What does Azure VPN Gateway provide?",o:["Stores encrypted files","Sends encrypted traffic between Azure VNet and on-premises over the public internet","Manages container images","Runs serverless code"],a:1,e:"Azure VPN Gateway sends encrypted traffic between an Azure VNet and on-premises networks over the public internet. It supports Site-to-Site, Point-to-Site, and VNet-to-VNet connections."},
+{d:"Azure Architecture & Services",q:"What does Azure ExpressRoute provide?",o:["A free VPN service","A private, dedicated connection between on-premises infrastructure and Azure that doesn't go over the public internet","Faster virtual machines","Free DNS hosting"],a:1,e:"Azure ExpressRoute creates private, dedicated connections between your on-premises network and Azure. Traffic doesn't go over the public internet, providing more reliability, faster speeds, consistent latencies, and higher security."},
+{d:"Azure Architecture & Services",q:"What is the difference between VPN Gateway and ExpressRoute?",o:["They are the same service","VPN Gateway uses the public internet (encrypted); ExpressRoute uses a private dedicated connection","ExpressRoute is free; VPN is paid","VPN is faster than ExpressRoute"],a:1,e:"VPN Gateway sends encrypted traffic over the public internet — suitable for lower bandwidth and cost-effective connectivity. ExpressRoute uses a private, dedicated connection not traversing the internet — ideal for higher bandwidth, lower latency, and greater reliability."},
+{d:"Azure Architecture & Services",q:"What is Azure DNS?",o:["A domain registration service only","A hosting service for DNS domains using Azure infrastructure with high availability","A virtual machine service","A storage service"],a:1,e:"Azure DNS hosts your DNS domains on Azure infrastructure, providing name resolution using Microsoft's global network of DNS name servers. It offers high availability, fast performance, and integration with other Azure services. Note: it does not support domain registration."},
+{d:"Azure Architecture & Services",q:"What is Azure Load Balancer?",o:["A tool that writes balanced code","A networking service that distributes incoming traffic across multiple VMs for high availability","A database optimization tool","A cost management service"],a:1,e:"Azure Load Balancer distributes incoming network traffic across multiple VMs to ensure no single VM is overwhelmed. It supports both inbound and outbound scenarios, provides low latency and high throughput, and operates at Layer 4 (TCP/UDP)."},
+{d:"Azure Architecture & Services",q:"What is Azure Application Gateway?",o:["A Layer 4 load balancer","A Layer 7 (HTTP/HTTPS) load balancer with Web Application Firewall capabilities","A VPN service","A DNS service"],a:1,e:"Azure Application Gateway is a web traffic (Layer 7) load balancer that can route traffic based on URL paths, host headers, and more. It also includes an optional Web Application Firewall (WAF) for protection against web exploits."},
+{d:"Azure Architecture & Services",q:"What is Azure Content Delivery Network (CDN)?",o:["A database backup service","A globally distributed network of servers that caches content close to end users","A VM deployment tool","A developer IDE"],a:1,e:"Azure CDN caches content at strategically placed edge locations around the world, minimizing latency by serving content from servers closest to the end user. It's ideal for serving static content like images, videos, and scripts."},
+{d:"Azure Architecture & Services",q:"What is Azure Front Door?",o:["A physical security entrance","A global, scalable entry point for web applications providing load balancing, CDN, and WAF","A VM image gallery","A billing tool"],a:1,e:"Azure Front Door is a global load balancer and CDN that provides fast, reliable, and secure access to web applications. It includes SSL offloading, URL-based routing, WAF, and DDoS protection at the edge."},
+{d:"Azure Architecture & Services",q:"What is Azure Bastion?",o:["A firewall service","A service that provides secure RDP and SSH connectivity to VMs without exposing public IP addresses","A container service","A CDN"],a:1,e:"Azure Bastion provides seamless RDP and SSH access to your VMs directly through the Azure portal over TLS, without needing public IP addresses on the VMs. This protects VMs from exposure to the public internet."},
+
+// -- Storage services --
+{d:"Azure Architecture & Services",q:"What is an Azure Storage Account?",o:["A user login account","A service that provides a unique namespace for Azure Storage data accessible from anywhere over HTTP/HTTPS","A type of VM","A billing account"],a:1,e:"An Azure Storage Account provides a unique namespace in Azure for your data. Every object you store has an address that includes your unique account name. It supports Blob, File, Queue, Table, and Disk storage."},
+{d:"Azure Architecture & Services",q:"What is Azure Blob Storage primarily used for?",o:["Relational database storage","Storing massive amounts of unstructured data like text, images, and video","Running virtual machines","Managing Active Directory"],a:1,e:"Azure Blob Storage is optimized for storing massive amounts of unstructured data such as text, binary data, images, videos, backups, and logs. It's accessible from anywhere via HTTP/HTTPS."},
+{d:"Azure Architecture & Services",q:"What are the three access tiers for Azure Blob Storage?",o:["Fast, Medium, Slow","Hot, Cool, Archive","Primary, Secondary, Tertiary","Standard, Premium, Ultra"],a:1,e:"Hot tier: frequently accessed data (highest storage cost, lowest access cost). Cool tier: infrequently accessed, stored for at least 30 days. Archive tier: rarely accessed, stored for at least 180 days (lowest storage cost, highest access cost, offline)."},
+{d:"Azure Architecture & Services",q:"What is Azure Files?",o:["A document editing service","Fully managed file shares in the cloud accessible via SMB and NFS protocols","A VM management service","A container orchestration tool"],a:1,e:"Azure Files provides fully managed file shares that can be mounted using the SMB or NFS protocol. They can be accessed from cloud or on-premises deployments and are ideal for replacing or supplementing on-premises file servers."},
+{d:"Azure Architecture & Services",q:"What is Azure Queue Storage?",o:["A line at an Azure support center","A service for storing large numbers of messages for asynchronous processing","A file storage service","A database service"],a:1,e:"Azure Queue Storage provides cloud messaging between application components. Messages can be up to 64 KB in size, and a queue can contain millions of messages. It's used for creating a backlog of work to process asynchronously."},
+{d:"Azure Architecture & Services",q:"What is Azure Table Storage?",o:["A furniture catalog","A NoSQL key-value store for semi-structured data","A relational database","A file sharing service"],a:1,e:"Azure Table Storage is a NoSQL key-value store for semi-structured data. It stores large amounts of structured, non-relational data and is accessed via authenticated calls using OData and LINQ queries."},
+{d:"Azure Architecture & Services",q:"What is Azure Managed Disks?",o:["A physical hard drive you can purchase","Block-level storage volumes managed by Azure for use with Azure VMs","A file sharing protocol","A CDN service"],a:1,e:"Azure Managed Disks are block-level storage volumes managed by Azure and used with Azure VMs. Available types include Ultra Disk, Premium SSD, Standard SSD, and Standard HDD, each with different performance/cost profiles."},
+{d:"Azure Architecture & Services",q:"Which Azure storage redundancy option stores three copies of data within a single datacenter?",o:["Geo-Redundant Storage (GRS)","Zone-Redundant Storage (ZRS)","Locally Redundant Storage (LRS)","Read-Access Geo-Redundant Storage (RA-GRS)"],a:2,e:"LRS maintains three copies of your data within a single datacenter in the primary region. It offers the lowest cost but the least durability — if the datacenter fails, you may lose data."},
+{d:"Azure Architecture & Services",q:"Which storage redundancy option replicates data across three availability zones in the primary region?",o:["LRS","ZRS","GRS","RA-GRS"],a:1,e:"Zone-Redundant Storage (ZRS) replicates your data synchronously across three availability zones in the primary region, protecting against datacenter-level failures within a region."},
+{d:"Azure Architecture & Services",q:"Which storage redundancy option replicates data to a secondary region?",o:["LRS","ZRS","GRS","Premium SSD"],a:2,e:"Geo-Redundant Storage (GRS) copies data to a secondary region hundreds of miles away. It maintains 3 copies in the primary region (LRS) and 3 in the secondary region, protecting against regional outages."},
+{d:"Azure Architecture & Services",q:"What does RA-GRS provide beyond GRS?",o:["Faster writes","Read access to data in the secondary region even when the primary region is available","Cheaper storage","More copies of data"],a:1,e:"Read-Access Geo-Redundant Storage (RA-GRS) provides the same geo-replication as GRS but also allows read access to the secondary region's data at any time, not just during a failover."},
+{d:"Azure Architecture & Services",q:"What does GZRS combine?",o:["GRS and LRS","ZRS in the primary region with GRS replication to a secondary region","Two GRS accounts","Nothing, it doesn't exist"],a:1,e:"Geo-Zone-Redundant Storage (GZRS) combines the high availability of ZRS (3 copies across availability zones in primary region) with GRS protection (3 LRS copies in a secondary region). RA-GZRS adds read access to the secondary."},
+{d:"Azure Architecture & Services",q:"What is Azure Data Box?",o:["A virtual storage container","A physical device for transferring large amounts of data to Azure when network transfer isn't practical","A mailbox service","A database backup tool"],a:1,e:"Azure Data Box is a physical data transfer service. Microsoft ships you a ruggedized storage device (up to 80 TB). You load your data onto it and ship it back. It's ideal for large data migrations when network bandwidth is limited or too costly."},
+{d:"Azure Architecture & Services",q:"What is AzCopy?",o:["A clipboard app","A command-line utility for copying data to/from Azure Storage accounts","A VM cloning tool","A database migration tool"],a:1,e:"AzCopy is a command-line tool for copying blobs or files to or from an Azure storage account. It supports one-direction synchronization and can transfer data between storage accounts."},
+{d:"Azure Architecture & Services",q:"What is Azure Storage Explorer?",o:["A web browser","A standalone GUI application for managing Azure Storage data on Windows, macOS, and Linux","A VM monitoring tool","A network scanner"],a:1,e:"Azure Storage Explorer is a free, standalone app with a graphical interface that lets you easily manage Azure Storage data (blobs, files, queues, tables) on Windows, macOS, and Linux."},
+{d:"Azure Architecture & Services",q:"What is Azure File Sync?",o:["A tool to sync your personal photos","A service that caches Azure file shares on Windows Server for local access while syncing to the cloud","A database synchronization tool","A code repository sync"],a:1,e:"Azure File Sync centralizes your organization's file shares in Azure Files while keeping the flexibility and performance of an on-premises Windows file server. It transforms Windows Server into a quick cache of your Azure file share."},
+{d:"Azure Architecture & Services",q:"What is Azure Migrate?",o:["A tool for migrating user accounts between departments","A hub of tools for discovering, assessing, and migrating on-premises resources to Azure","A VM resizing tool","A billing migration service"],a:1,e:"Azure Migrate provides a central hub with tools for discovering and assessing on-premises servers, databases, and web apps for migration to Azure. It includes tools for VMware, Hyper-V, physical server, database, and web app migration."},
+
+// -- Database services --
+{d:"Azure Architecture & Services",q:"What is Azure SQL Database?",o:["An on-premises database only","A fully managed PaaS relational database engine based on SQL Server","A NoSQL database","A file storage service"],a:1,e:"Azure SQL Database is a fully managed PaaS relational database engine. Microsoft handles patching, backups, monitoring, and high availability. It's based on the latest stable version of SQL Server."},
+{d:"Azure Architecture & Services",q:"What is Azure Cosmos DB?",o:["A relational-only database","A globally distributed, multi-model NoSQL database designed for low latency","A file storage service","A compute service"],a:1,e:"Azure Cosmos DB is a globally distributed, multi-model database service with guaranteed single-digit-millisecond latency and 99.999% availability. It supports APIs for SQL, MongoDB, Cassandra, Gremlin (graph), and Table."},
+{d:"Azure Architecture & Services",q:"What is Azure SQL Managed Instance?",o:["A SaaS email service","A PaaS offering with near 100% compatibility with on-premises SQL Server, ideal for lift-and-shift","A NoSQL database","A monitoring tool"],a:1,e:"Azure SQL Managed Instance provides the broadest SQL Server engine compatibility and native VNet support, making it ideal for lift-and-shift migrations from on-premises SQL Server with minimal changes."},
+{d:"Azure Architecture & Services",q:"What is Azure Database for MySQL?",o:["A NoSQL database","A fully managed PaaS MySQL database service","A file sync tool","A VM type"],a:1,e:"Azure Database for MySQL is a fully managed relational database service based on the community edition of MySQL. It offers built-in high availability, automated backups, and scaling with no additional cost for HA."},
+{d:"Azure Architecture & Services",q:"What is Azure Database for PostgreSQL?",o:["A graph database","A fully managed PaaS PostgreSQL database service","A queue service","A CDN"],a:1,e:"Azure Database for PostgreSQL is a fully managed relational database service based on the community version of PostgreSQL, available in single-server and flexible-server deployment options with built-in HA."},
+
+// -- Identity, access, and security --
+{d:"Azure Architecture & Services",q:"What is Microsoft Entra ID (formerly Azure AD)?",o:["A relational database","A cloud-based identity and access management service","A virtual machine service","A storage account type"],a:1,e:"Microsoft Entra ID is Microsoft's cloud-based identity and access management service. It provides authentication, SSO, MFA, conditional access, and application management for users signing in to Microsoft and third-party services."},
+{d:"Azure Architecture & Services",q:"How does Microsoft Entra ID differ from on-premises Active Directory?",o:["They are identical","Entra ID is cloud-based using HTTP/HTTPS protocols; on-prem AD uses Kerberos/LDAP and is for on-premises networks","Entra ID is only for email","On-prem AD doesn't support groups"],a:1,e:"On-premises Active Directory uses Kerberos and LDAP for authentication within a corporate network. Microsoft Entra ID is cloud-based, uses HTTP/HTTPS (REST APIs, OAuth, SAML, OpenID Connect), and is designed for internet-based authentication and authorization."},
+{d:"Azure Architecture & Services",q:"What is Single Sign-On (SSO)?",o:["Signing in once to access multiple applications without re-entering credentials","Using a single password for one app","A security vulnerability","An encryption algorithm"],a:0,e:"SSO enables users to sign in once and use that credential to access multiple applications and resources. It reduces password fatigue and simplifies access management."},
+{d:"Azure Architecture & Services",q:"What does Multi-Factor Authentication (MFA) provide?",o:["Faster login times","An additional layer of security requiring two or more verification methods","Automatic password changes","Free premium features"],a:1,e:"MFA requires two or more factors during sign-in: something you know (password), something you have (phone), or something you are (biometric). This drastically reduces the risk of compromised credentials."},
+{d:"Azure Architecture & Services",q:"What is Microsoft Entra External Identities?",o:["A service for managing internal employees only","A way to let external users (partners, customers) sign in using their own identity provider","A DNS service","A storage encryption tool"],a:1,e:"Microsoft Entra External Identities allows people outside your organization to access your apps and resources. External users can sign in with their preferred identity (Google, Facebook, corporate account). This includes B2B collaboration and B2C identity management."},
+{d:"Azure Architecture & Services",q:"What is Conditional Access in Microsoft Entra ID?",o:["Access that is always granted","A tool that uses signals (user, location, device, app, risk) to make access decisions and enforce policies","A type of VPN","A billing feature"],a:1,e:"Conditional Access policies are if-then statements: IF a user wants to access a resource, THEN they must complete an action (like MFA). Signals like user location, device state, application, and risk level drive decisions."},
+{d:"Azure Architecture & Services",q:"What is Azure Role-Based Access Control (RBAC)?",o:["A tool for managing resource costs","A system for managing who has access to Azure resources, what they can do, and what scope they can access","A type of load balancer","A storage tier"],a:1,e:"Azure RBAC is an authorization system built on Azure Resource Manager. It lets you manage access with built-in roles (Owner, Contributor, Reader) or custom roles, applied at various scopes (management group, subscription, resource group, resource)."},
+{d:"Azure Architecture & Services",q:"What is the principle of least privilege?",o:["Giving everyone admin access","Granting only the minimum access needed to perform a task","Removing all access from users","A pricing model"],a:1,e:"The principle of least privilege means granting users only the minimum level of access they need to perform their tasks. This limits the blast radius of compromised accounts and reduces accidental changes."},
+{d:"Azure Architecture & Services",q:"What is the Zero Trust security model?",o:["Trusting everything inside the corporate network","A model that assumes breach and verifies every request as if it originates from an untrusted network","A free security tier","Trusting all authenticated users completely"],a:1,e:"Zero Trust assumes breach and verifies every request explicitly, regardless of where it originates. Core principles: verify explicitly, use least privilege access, and assume breach. It doesn't trust based on network location alone."},
+{d:"Azure Architecture & Services",q:"What is Defense in Depth?",o:["Having one very strong security measure","A layered approach to security with multiple levels of protection","A type of Azure firewall","A DDoS attack type"],a:1,e:"Defense in depth uses multiple layers of security: physical security, identity & access, perimeter, network, compute, application, and data. If one layer fails, subsequent layers prevent further exposure. It slows down attackers and provides alert telemetry."},
+{d:"Azure Architecture & Services",q:"What is Microsoft Defender for Cloud?",o:["An antivirus for personal computers","A cloud security posture management (CSPM) and threat protection service for Azure, hybrid, and multi-cloud","A backup service","A DNS provider"],a:1,e:"Microsoft Defender for Cloud provides security posture management and workload protection. It continuously assesses your environment, provides security recommendations, detects threats, and can protect workloads across Azure, on-premises, and other clouds."},
+{d:"Azure Architecture & Services",q:"What is Azure Key Vault used for?",o:["Running virtual machines","Securely storing and managing secrets, encryption keys, and certificates","Managing resource groups","Creating virtual networks"],a:1,e:"Azure Key Vault helps safeguard cryptographic keys, secrets (passwords, connection strings, API keys), and certificates used by cloud applications and services. It provides centralized secret management with access logging and auditing."},
+{d:"Azure Architecture & Services",q:"Which Azure service provides DDoS protection?",o:["Azure Firewall only","Azure DDoS Protection","Azure Key Vault","Azure Monitor"],a:1,e:"Azure DDoS Protection provides enhanced mitigation against DDoS attacks. The Basic tier is free and automatically enabled. The Standard tier offers advanced protection with adaptive tuning, attack analytics, and integration with Azure Monitor."},
+{d:"Azure Architecture & Services",q:"What is Azure Firewall?",o:["A physical firewall appliance","A managed, cloud-based network security service that protects Azure VNet resources","A code scanning tool","A load balancer"],a:1,e:"Azure Firewall is a managed, stateful firewall-as-a-service with built-in high availability and unrestricted cloud scalability. It provides network and application-level filtering, threat intelligence-based filtering, and FQDN filtering."},
+{d:"Azure Architecture & Services",q:"What is the purpose of Network Security Groups (NSGs)?",o:["To encrypt data at rest","To filter network traffic to and from Azure resources using security rules","To manage DNS records","To create virtual machines"],a:1,e:"NSGs contain inbound and outbound security rules that allow or deny network traffic based on source/destination IP, port, and protocol. They can be associated with subnets or individual network interfaces."},
+{d:"Azure Architecture & Services",q:"What is the difference between Azure Firewall and NSGs?",o:["They are the same thing","Azure Firewall is a full stateful firewall service with threat intelligence; NSGs are basic traffic filtering rules at the subnet/NIC level","NSGs are more advanced than Azure Firewall","Azure Firewall is free; NSGs are paid"],a:1,e:"NSGs provide basic network-layer traffic filtering (allow/deny by IP, port, protocol). Azure Firewall is a full-featured, managed firewall service offering application-level filtering, FQDN filtering, threat intelligence, and centralized logging. They're often used together."},
+{d:"Azure Architecture & Services",q:"What is Microsoft Sentinel?",o:["A monitoring dashboard","A cloud-native SIEM (Security Information and Event Management) and SOAR solution","A type of VM","A database engine"],a:1,e:"Microsoft Sentinel is a scalable, cloud-native SIEM and SOAR solution. It collects security data across your enterprise, detects threats with AI, investigates incidents, and can automatically respond to threats."},
+
+// -- Additional Azure services --
+{d:"Azure Architecture & Services",q:"What is the Azure Marketplace?",o:["A physical retail store","An online store for buying and selling cloud solutions certified to run on Azure","A stock trading platform","A developer forum"],a:1,e:"Azure Marketplace is an online store with thousands of IT solutions and services built by Microsoft and partners. It includes VMs, templates, SaaS apps, consulting services, and developer tools, all certified for Azure."},
+{d:"Azure Architecture & Services",q:"What is Azure IoT Hub?",o:["A central building for IoT devices","A managed service for bi-directional communication between IoT applications and IoT devices","A data analytics tool","A VM management service"],a:1,e:"Azure IoT Hub is a managed service that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. It supports multiple messaging patterns and device management."},
+{d:"Azure Architecture & Services",q:"What is Azure IoT Central?",o:["A physical IoT device","A fully managed IoT SaaS solution for connecting, monitoring, and managing IoT devices at scale","A database for IoT data","A networking protocol"],a:1,e:"Azure IoT Central is a fully managed SaaS solution that reduces the burden of developing, managing, and maintaining IoT solutions. It provides pre-built templates, dashboards, and device management without deep cloud expertise."},
+{d:"Azure Architecture & Services",q:"What is Azure Synapse Analytics?",o:["A social media platform","An integrated analytics service combining big data and data warehousing","A VM monitoring tool","An email service"],a:1,e:"Azure Synapse Analytics brings together enterprise data warehousing and big data analytics. It lets you query data on your terms, using serverless or provisioned resources, with a unified experience for ingesting, preparing, managing, and serving data."},
+{d:"Azure Architecture & Services",q:"What is Azure HDInsight?",o:["A display resolution service","A fully managed, open-source analytics service for enterprises supporting Hadoop, Spark, Hive, and more","A VPN service","A container registry"],a:1,e:"Azure HDInsight is a managed cloud service for running popular open-source big data frameworks including Apache Hadoop, Spark, Hive, Kafka, and HBase. It simplifies big data processing and analytics."},
+{d:"Azure Architecture & Services",q:"What is Azure Databricks?",o:["A building material service","A data analytics platform optimized for Azure, based on Apache Spark","A VM deployment tool","A DNS service"],a:1,e:"Azure Databricks is a fast, easy, and collaborative Apache Spark-based analytics platform. It provides an interactive workspace for data engineering, data science, and machine learning with built-in Azure integration."},
+{d:"Azure Architecture & Services",q:"What is Azure Machine Learning?",o:["A tool for training employees","A cloud-based platform for building, training, and deploying machine learning models","A VM monitoring tool","A backup service"],a:1,e:"Azure Machine Learning is a cloud platform for training, deploying, automating, and managing machine learning models. It supports the complete ML lifecycle with tools for data preparation, model training, deployment, and MLOps."},
+{d:"Azure Architecture & Services",q:"What are Azure Cognitive Services (now Azure AI Services)?",o:["HR management tools","Pre-built AI APIs for vision, speech, language, and decision capabilities","A type of VM","A billing service"],a:1,e:"Azure AI Services (formerly Cognitive Services) provide pre-built AI APIs that developers can use to add intelligent features like image recognition, speech-to-text, natural language understanding, and anomaly detection to their applications without ML expertise."},
+{d:"Azure Architecture & Services",q:"What is Azure Bot Service?",o:["A robotic hardware platform","A platform for building, testing, and deploying intelligent conversational bots","A VM auto-scaling feature","A monitoring dashboard"],a:1,e:"Azure Bot Service provides an integrated environment for building intelligent bots that can interact naturally with users across channels like websites, Teams, Slack, and more. It integrates with Azure AI Services."},
+{d:"Azure Architecture & Services",q:"What is Azure DevOps?",o:["A VM management tool","A suite of development tools for CI/CD, version control, project tracking, testing, and artifact management","A monitoring service","A security scanner"],a:1,e:"Azure DevOps provides developer services including Azure Boards (work tracking), Azure Repos (Git repos), Azure Pipelines (CI/CD), Azure Test Plans (testing), and Azure Artifacts (package management)."},
+{d:"Azure Architecture & Services",q:"What is Azure DevTest Labs?",o:["A free training environment","A service for quickly creating environments in Azure while minimizing waste and controlling costs","A load testing service","A production deployment tool"],a:1,e:"Azure DevTest Labs helps developers and testers quickly create environments in Azure while minimizing waste and controlling cost. You can test latest application versions using reusable templates and artifacts."},
+
+// ===========================
+// DOMAIN 3 — MANAGEMENT & GOVERNANCE
+// ===========================
+
+// -- Cost management --
+{d:"Management & Governance",q:"Which tool provides cost analysis and budget alerts for Azure resources?",o:["Azure Monitor","Azure Cost Management + Billing","Azure Advisor","Azure Policy"],a:1,e:"Azure Cost Management + Billing helps you analyze cloud costs, set budgets, create spending alerts, and allocate costs. It provides rich analytics and recommendations to optimize your spending."},
+{d:"Management & Governance",q:"What is the Azure Pricing Calculator used for?",o:["Paying Azure bills","Estimating the cost of Azure products and services before deployment","Monitoring resource performance","Managing user identities"],a:1,e:"The Azure Pricing Calculator lets you configure and estimate the costs of Azure products before you deploy them. You can build out solutions and compare pricing scenarios to plan your budget."},
+{d:"Management & Governance",q:"What is the Azure Total Cost of Ownership (TCO) Calculator?",o:["A tool to calculate VM CPU usage","A tool to estimate cost savings by migrating workloads from on-premises to Azure","A billing payment tool","A network speed test"],a:1,e:"The TCO Calculator helps estimate the cost savings you can realize by migrating to Azure. It compares your on-premises infrastructure costs (servers, storage, networking, labor, electricity) with equivalent Azure costs."},
+{d:"Management & Governance",q:"What factors can affect Azure costs?",o:["Only the region","Resource type, usage amount, region, data transfer, and pricing model","Only the subscription type","Only the resource type"],a:1,e:"Azure costs are influenced by many factors: resource type and configuration, usage/consumption amounts, Azure region, inbound/outbound data transfer, pricing model (pay-as-you-go vs reserved), and service tier."},
+{d:"Management & Governance",q:"What are Azure Reservations?",o:["Hotel bookings for Azure events","Commitment to use a specific amount of resources for 1 or 3 years in exchange for discounted pricing","A type of storage","A monitoring tool"],a:1,e:"Azure Reservations let you save money by committing to one-year or three-year plans for multiple products. You can get up to 72% price savings compared to pay-as-you-go pricing. Available for VMs, storage, databases, and more."},
+{d:"Management & Governance",q:"What are Azure Spot VMs?",o:["VMs with guaranteed uptime","VMs that use Azure's unused compute capacity at deep discounts but can be evicted when Azure needs the capacity back","Free VMs for testing","VMs in a specific spot/region"],a:1,e:"Spot VMs let you use Azure's unused compute capacity at significant cost savings (up to 90%). However, Azure can evict them with 30 seconds' notice when it needs the capacity. They're great for batch processing, dev/test, and fault-tolerant workloads."},
+{d:"Management & Governance",q:"How does Azure charge for data transfer?",o:["All data transfer is free","Inbound data transfer is generally free; outbound data transfer is charged","Outbound data transfer is free; inbound is charged","Both directions are always charged"],a:1,e:"Azure generally does not charge for inbound data transfer (data going into Azure datacenters). Outbound data transfer (data leaving Azure datacenters) is charged based on billing zones. Data transfer between Azure services in the same region is often free."},
+{d:"Management & Governance",q:"What is the purpose of Tags in Azure?",o:["To label and organize resources for cost tracking, automation, and governance","To encrypt data","To create virtual networks","To configure DNS"],a:0,e:"Tags are name-value pairs applied to Azure resources, resource groups, and subscriptions. They help logically organize resources for cost tracking (e.g., tag by department), automation, security classification, and regulatory compliance."},
+{d:"Management & Governance",q:"Can Azure Tags be inherited from a resource group to its resources by default?",o:["Yes, always","No, tags are not automatically inherited — you must use Azure Policy to enforce tag inheritance","Only for VMs","Only in premium subscriptions"],a:1,e:"By default, tags applied to a resource group are NOT inherited by its child resources. You can use Azure Policy to enforce tag inheritance, requiring resources to inherit specific tags from their parent resource group."},
+
+// -- Governance and compliance --
+{d:"Management & Governance",q:"What is Azure Policy used for?",o:["Creating virtual machines","Creating, assigning, and managing policies that enforce rules and effects on Azure resources","Managing user passwords","Configuring network routes"],a:1,e:"Azure Policy evaluates resources for non-compliance with assigned policies. It can audit, deny, deploy, or modify resources. For example, you can create a policy that only allows specific VM sizes or requires resources in certain regions."},
+{d:"Management & Governance",q:"What is an Azure Policy Initiative?",o:["A single policy rule","A collection of Azure Policy definitions grouped together to achieve a larger compliance goal","A billing plan","A support ticket"],a:1,e:"A Policy Initiative (also called a policy set) is a collection of policy definitions grouped together. For example, a 'Security Baseline' initiative might include policies for encryption, network security, and access control, all assigned and tracked together."},
+{d:"Management & Governance",q:"What are Azure Resource Locks?",o:["Encryption keys for resources","Settings that prevent accidental deletion or modification of resources","Network security rules","Billing alerts"],a:1,e:"Resource Locks prevent accidental changes to critical resources. There are two types: CanNotDelete (users can read and modify but not delete) and ReadOnly (users can read but cannot modify or delete)."},
+{d:"Management & Governance",q:"What are the two types of Azure Resource Locks?",o:["Open and Closed","CanNotDelete and ReadOnly","Allow and Deny","Admin and User"],a:1,e:"CanNotDelete means authorized users can read and modify a resource but cannot delete it. ReadOnly means authorized users can only read a resource — they cannot update or delete it. Locks apply regardless of RBAC permissions."},
+{d:"Management & Governance",q:"What is Azure Blueprints?",o:["A drawing tool for network diagrams","A service for defining repeatable sets of Azure resources that implement and adhere to standards","A CI/CD pipeline tool","A database schema designer"],a:1,e:"Azure Blueprints enables defining a repeatable set of Azure resources that implements and adheres to organizational standards. A blueprint can include role assignments, policy assignments, ARM templates, and resource groups — all versioned and auditable."},
+{d:"Management & Governance",q:"How do Azure Blueprints differ from ARM templates?",o:["They are identical","Blueprints maintain an active connection between the definition and what was deployed, and can include policies and RBAC; ARM templates are just deployment definitions","Blueprints are cheaper","ARM templates are more powerful"],a:1,e:"ARM templates are deployment artifacts with no active relationship to deployed resources. Blueprints preserve the relationship between the blueprint definition and the assignment, enabling auditing and updating of deployments, and can package ARM templates with policies and RBAC."},
+{d:"Management & Governance",q:"What is the Microsoft Service Trust Portal?",o:["A portal for purchasing Azure services","A portal providing audit reports, compliance guides, and trust documents about Microsoft cloud services","A VM management portal","A DNS configuration portal"],a:1,e:"The Service Trust Portal provides audit reports, compliance documentation, data protection information, and trust documents. It helps organizations understand how Microsoft cloud services protect their data and comply with regulations."},
+{d:"Management & Governance",q:"What is Microsoft Purview?",o:["A code editor","A unified data governance solution for managing and governing on-premises, multi-cloud, and SaaS data","A VM image gallery","A network monitoring tool"],a:1,e:"Microsoft Purview provides a unified data governance solution that helps organizations manage and govern their data across on-premises, multi-cloud, and SaaS environments. It includes data cataloging, data lineage, compliance, and risk management."},
+{d:"Management & Governance",q:"What does the Microsoft Purview compliance portal help with?",o:["VM deployment","Understanding and managing compliance and data protection across the organization","Network routing","Cost management"],a:1,e:"The Microsoft Purview compliance portal provides tools to understand your organization's compliance posture, manage data protection, implement information barriers, manage insider risk, and respond to regulatory requirements."},
+
+// -- Managing and deploying resources --
+{d:"Management & Governance",q:"What is the Azure Portal?",o:["A physical entrance to Azure datacenters","A web-based, unified console for managing Azure resources through a GUI","A command-line tool","An API endpoint"],a:1,e:"The Azure Portal is a web-based, graphical management console. It provides a unified view where you can build, manage, and monitor everything from simple web apps to complex cloud deployments using a visual interface."},
+{d:"Management & Governance",q:"What is Azure Cloud Shell?",o:["A physical shell around Azure servers","A browser-based shell experience with Bash and PowerShell, built into the Azure Portal","A VM template","A network enclosure"],a:1,e:"Azure Cloud Shell is a browser-based command-line experience built into the Azure Portal. It supports both Bash and PowerShell, comes pre-installed with Azure management tools, and requires no local installation or configuration."},
+{d:"Management & Governance",q:"What is Azure PowerShell?",o:["A power supply management tool","A set of cmdlets for managing Azure resources directly from the PowerShell command line","A monitoring dashboard","A pricing tool"],a:1,e:"Azure PowerShell is a set of cmdlets that allow you to manage Azure resources directly from PowerShell. It can be installed locally or used through Azure Cloud Shell, and supports scripting for automation."},
+{d:"Management & Governance",q:"What does the Azure CLI provide?",o:["A graphical user interface","A cross-platform command-line tool for managing Azure resources using commands","An email client","A virtual network"],a:1,e:"The Azure CLI is a cross-platform command-line tool for managing Azure resources. It uses commands (e.g., az vm create) and supports scripting for automation. It can be used locally or through Cloud Shell."},
+{d:"Management & Governance",q:"What is Azure Arc?",o:["A gaming service","A service that extends Azure management, governance, and services to hybrid and multi-cloud environments","A CDN service","A database migration tool"],a:1,e:"Azure Arc lets you manage servers, Kubernetes clusters, Azure data services, SQL Server, and VMs running outside Azure (on-premises or other clouds) using the same Azure tools, policies, RBAC, and automation as native Azure resources."},
+{d:"Management & Governance",q:"What are ARM (Azure Resource Manager) templates?",o:["Email templates for Azure alerts","JSON files that define infrastructure and configuration for repeatable Azure deployments (Infrastructure as Code)","VM operating system images","Network routing tables"],a:1,e:"ARM templates are JSON files that define the infrastructure and configuration of Azure resources. They enable Infrastructure as Code (IaC), providing idempotent, repeatable, and consistent deployments that can be version-controlled."},
+{d:"Management & Governance",q:"What does 'idempotent' mean for ARM templates?",o:["They can only be used once","Deploying the same template multiple times produces the same result without duplicating resources","They are automatically encrypted","They cannot be modified"],a:1,e:"Idempotent means you can deploy the same ARM template repeatedly, and you'll get the same resource types in the same state every time. If the resources already exist, no changes are made. This ensures consistent, reliable deployments."},
+{d:"Management & Governance",q:"What is Infrastructure as Code (IaC)?",o:["Writing code that runs on infrastructure","Managing and provisioning infrastructure through machine-readable definition files instead of manual configuration","A programming language for cloud","A type of virtual machine"],a:1,e:"IaC is the practice of managing infrastructure through code and definition files rather than manual processes. ARM templates, Bicep, and Terraform are IaC tools for Azure. Benefits include version control, repeatability, and automation."},
+{d:"Management & Governance",q:"What is Azure Bicep?",o:["A muscle training app","A domain-specific language (DSL) for deploying Azure resources that compiles to ARM template JSON","A monitoring tool","A security scanner"],a:1,e:"Bicep is a DSL that uses declarative syntax to deploy Azure resources. It provides simpler, more concise syntax than ARM template JSON while offering the same capabilities. Bicep files compile to standard ARM templates."},
+{d:"Management & Governance",q:"How does Bicep compare to ARM templates?",o:["Bicep is less capable","Bicep offers simpler syntax, better tooling support, and compiles to ARM templates — it has the same capabilities but is easier to use","Bicep is a completely different system","Bicep only works with VMs"],a:1,e:"Bicep provides cleaner, more readable syntax compared to ARM template JSON. It compiles directly to ARM templates, so it has full feature parity. Benefits include type safety, modularity, automatic dependency management, and better IDE support."},
+
+// -- Monitoring tools --
+{d:"Management & Governance",q:"What does Azure Monitor do?",o:["Creates virtual machines","Collects, analyzes, and acts on telemetry from Azure and on-premises environments to maximize availability and performance","Manages user accounts","Deploys ARM templates"],a:1,e:"Azure Monitor collects and analyzes telemetry data (metrics and logs) from Azure resources, on-premises environments, and other clouds. It helps you understand performance, proactively identify issues, and set up alerts and automated actions."},
+{d:"Management & Governance",q:"What is Azure Log Analytics?",o:["A blogging platform","A tool in Azure Monitor for editing and running log queries against data collected by Azure Monitor","A VM deployment tool","A cost calculator"],a:1,e:"Log Analytics is the primary tool in the Azure portal for writing and running Kusto Query Language (KQL) queries against Azure Monitor Logs data. It lets you analyze, visualize, and explore collected telemetry data."},
+{d:"Management & Governance",q:"What are Azure Monitor Alerts?",o:["Email newsletters from Azure","Automated notifications triggered when Azure Monitor detects conditions in your telemetry data that match specified criteria","Marketing campaigns","System crash reports"],a:1,e:"Azure Monitor Alerts proactively notify you when conditions are found in your monitoring data. You can set alerts on metrics, logs, or activity logs. Alerts can trigger actions like emails, SMS, webhook calls, or Azure Functions."},
+{d:"Management & Governance",q:"What is Application Insights?",o:["A market research tool","A feature of Azure Monitor for application performance management (APM) — monitoring live web applications","A project management tool","A billing tool"],a:1,e:"Application Insights (part of Azure Monitor) is an APM service for monitoring live web applications. It automatically detects performance anomalies, tracks requests, dependencies, exceptions, and provides powerful diagnostic tools."},
+{d:"Management & Governance",q:"What is Azure Advisor?",o:["A chatbot for customer support","A personalized cloud consultant that provides best-practice recommendations across five categories","A code editor","A backup service"],a:1,e:"Azure Advisor analyzes your deployed resources and provides actionable recommendations in five categories: Reliability, Security, Performance, Operational Excellence, and Cost. It helps you optimize your Azure deployments."},
+{d:"Management & Governance",q:"What are the five categories of Azure Advisor recommendations?",o:["Speed, Cost, Size, Color, Shape","Reliability, Security, Performance, Operational Excellence, and Cost","Compute, Storage, Network, Identity, Monitoring","Dev, Test, Staging, Production, Archive"],a:1,e:"Azure Advisor provides recommendations in five categories: Reliability (improve continuity), Security (detect threats), Performance (improve speed), Operational Excellence (improve processes), and Cost (optimize spending)."},
+{d:"Management & Governance",q:"What is Azure Service Health?",o:["A health monitoring service for employees","A personalized dashboard tracking Azure service issues, planned maintenance, and health advisories that affect you","A virus scanner","A load balancer"],a:1,e:"Azure Service Health provides a personalized view of the health of Azure services and regions you use. It combines three services: Azure Status (broad view), Service Health (your services), and Resource Health (specific resources)."},
+{d:"Management & Governance",q:"What is the difference between Azure Status, Service Health, and Resource Health?",o:["They are the same service","Azure Status shows global Azure status; Service Health shows issues affecting YOUR services; Resource Health shows the health of individual resources","They are three pricing tiers","They are monitoring agents"],a:1,e:"Azure Status is a global view of Azure health across all regions. Service Health is a personalized view showing issues/maintenance affecting your specific services and regions. Resource Health provides the current and historical health status of individual resources."},
+{d:"Management & Governance",q:"What does the Azure Service Level Agreement (SLA) define?",o:["The maximum number of resources you can create","Microsoft's commitments for uptime and connectivity for Azure services","The price of Azure services","The types of VMs available"],a:1,e:"Azure SLAs are formal documents that define Microsoft's commitments for uptime and connectivity. Each Azure service has its own SLA (e.g., 99.9% or 99.99%). If Azure fails to meet the SLA, you may be eligible for service credits."},
+{d:"Management & Governance",q:"How do you calculate a composite SLA for multiple dependent services?",o:["Add the SLAs together","Multiply the individual SLAs (e.g., 99.9% x 99.9% = 99.8%)","Use the highest SLA","Use the lowest SLA"],a:1,e:"When your application depends on multiple Azure services, the composite SLA is calculated by multiplying the individual SLAs. For example, if App Service (99.95%) depends on SQL Database (99.99%), the composite SLA is 99.95% × 99.99% = 99.94%."},
+{d:"Management & Governance",q:"What happens when Azure fails to meet an SLA?",o:["Nothing","You may be eligible for a service credit (percentage of your monthly fee)","Azure automatically refunds the full amount","Your subscription is upgraded for free"],a:1,e:"When Azure doesn't meet its SLA commitments, you may be eligible for a service credit — a percentage of the applicable monthly service fees. The exact credit depends on the extent of the SLA breach (e.g., <99.9% uptime might yield a 10% credit)."},
+{d:"Management & Governance",q:"How can you increase the composite SLA of your application?",o:["By using fewer services","By adding redundancy, fallback paths, or availability zones","By reducing the number of users","By using smaller VM sizes"],a:1,e:"You can increase composite SLA by adding redundancy (e.g., deploying across availability zones or regions), implementing fallback paths (e.g., using a queue if a database is unavailable), and choosing services with higher individual SLAs."},
+{d:"Management & Governance",q:"What is an Azure free account?",o:["An account with unlimited free resources forever","An account that provides free access to popular Azure products for 12 months, $200 credit for 30 days, and 25+ always-free services","A trial that lasts 7 days","An account for students only"],a:1,e:"The Azure free account includes $200 credit to explore Azure for 30 days, free access to popular products for 12 months (like VMs, storage, databases), and 25+ products that are always free (like App Service, Functions, and Cosmos DB with limits)."},
+
+// -- Additional governance questions --
+{d:"Management & Governance",q:"Which Azure management tool should you use for one-time tasks and quick resource management?",o:["ARM templates","Azure Portal","Terraform","Azure DevOps"],a:1,e:"The Azure Portal is ideal for one-time, quick tasks and visual resource management. For repeatable or automated deployments, use ARM templates, Bicep, PowerShell, or CLI scripting."},
+{d:"Management & Governance",q:"Which tools support Infrastructure as Code on Azure?",o:["Only the Azure Portal","ARM templates, Bicep, Terraform, and Azure PowerShell/CLI scripts","Only Azure Advisor","Only Azure Monitor"],a:1,e:"Multiple tools support IaC on Azure: ARM templates (JSON), Bicep (DSL that compiles to ARM), Terraform (HashiCorp), and automation scripts using Azure PowerShell or Azure CLI. These all enable repeatable, version-controlled deployments."},
+{d:"Management & Governance",q:"What can Azure Policy do if a resource is non-compliant?",o:["Nothing, it only reports","It can audit, deny creation, modify/remediate resources, or deploy required configurations","It deletes the resource immediately","It sends a physical letter"],a:1,e:"Azure Policy effects include: Audit (log non-compliance), Deny (prevent resource creation/modification), Modify (add/update tags or properties), DeployIfNotExists (deploy required configurations), and Append (add fields). This allows enforcement at various levels."},
+{d:"Management & Governance",q:"Which tool would you use to see personalized recommendations for reducing Azure costs?",o:["Azure Monitor","Azure Advisor — Cost category","Azure Service Health","Azure Policy"],a:1,e:"Azure Advisor's Cost category provides personalized recommendations for reducing your Azure spend. These include identifying underutilized VMs, recommending reserved instances, right-sizing resources, and eliminating unused services."},
+{d:"Management & Governance",q:"A company needs to ensure all new VMs are created in specific regions only. Which Azure feature should they use?",o:["Azure Monitor","Azure Policy","Azure Advisor","Azure Blueprints only"],a:1,e:"Azure Policy can enforce allowed locations for resources. By creating and assigning a policy with the 'Allowed locations' definition, the company can deny VM creation in non-approved regions."},
+{d:"Management & Governance",q:"An admin wants to prevent anyone (including owners) from accidentally deleting a critical production database. Which feature should they use?",o:["Azure Policy","Azure Resource Lock (CanNotDelete)","Azure Monitor Alert","NSG rule"],a:1,e:"An Azure Resource Lock with the CanNotDelete type prevents any user from deleting the resource, regardless of their RBAC role. Even subscription owners must explicitly remove the lock before they can delete the resource."},
+{d:"Management & Governance",q:"What Azure feature allows you to organize resources by department, project, or environment for cost tracking?",o:["Resource Groups only","Tags","Availability Zones","Management Groups only"],a:1,e:"Tags (name-value pairs) applied to resources, resource groups, or subscriptions are the primary way to organize resources for cost tracking by department, project, environment, or any other categorization. Azure Cost Management can filter and group costs by tag."},
+{d:"Management & Governance",q:"Which Azure CLI command prefix is used for all commands?",o:["azure","az","azcli","msaz"],a:1,e:"All Azure CLI commands start with 'az' followed by the service and operation. For example: 'az vm create', 'az group list', 'az storage account create'. This consistent pattern makes commands easy to discover and use."},
+
+// -- Extra cross-domain / scenario questions --
+{d:"Cloud Concepts",q:"A company has unpredictable, spiky workloads. Which cloud benefit is MOST important for them?",o:["Governance","Elasticity","Physical security","Compliance"],a:1,e:"Elasticity allows resources to automatically scale up during demand spikes and scale down when demand decreases. For unpredictable workloads, this ensures adequate capacity without over-provisioning and wasting money."},
+{d:"Cloud Concepts",q:"Which statement about CapEx and OpEx is TRUE?",o:["Cloud computing is entirely CapEx","Cloud computing shifts spending from CapEx (upfront infrastructure) to OpEx (pay-as-you-go services)","CapEx has no upfront costs","OpEx requires large upfront hardware purchases"],a:1,e:"Cloud computing enables an OpEx model: instead of buying and managing physical infrastructure (CapEx), you pay for services as you consume them. This reduces upfront costs and provides more financial flexibility."},
+{d:"Azure Architecture & Services",q:"A company needs a private, high-bandwidth connection to Azure that does NOT traverse the public internet. Which service should they use?",o:["Azure VPN Gateway","Azure ExpressRoute","Azure CDN","Azure Front Door"],a:1,e:"Azure ExpressRoute provides private, dedicated connectivity between on-premises networks and Azure datacenters. Traffic never traverses the public internet, offering higher reliability, faster speeds, and lower latencies than VPN connections."},
+{d:"Azure Architecture & Services",q:"Which storage tier should you use for data that is rarely accessed and can tolerate retrieval delays of several hours?",o:["Hot","Cool","Archive","Premium"],a:2,e:"The Archive tier is for data that is rarely accessed and stored for at least 180 days. It has the lowest storage cost but the highest access cost and retrieval latency (hours to rehydrate). Ideal for long-term backups and compliance archives."},
+{d:"Azure Architecture & Services",q:"Which service should you use to run a containerized application quickly without managing VMs or orchestrators?",o:["Azure Virtual Machines","Azure Container Instances (ACI)","Azure HDInsight","Azure Data Box"],a:1,e:"Azure Container Instances is the fastest and simplest way to run a container in Azure. It doesn't require VM management or Kubernetes orchestration. It's ideal for quick, isolated container runs like batch jobs, build agents, or simple apps."},
+{d:"Azure Architecture & Services",q:"Which Azure identity service provides B2C (business-to-consumer) identity management?",o:["Azure Kubernetes Service","Microsoft Entra External Identities","Azure SQL Database","Azure Blob Storage"],a:1,e:"Microsoft Entra External Identities (which includes Azure AD B2C) provides identity management for consumer-facing applications. It allows customers to sign in with their preferred identities (Google, Facebook, email) while you control access policies."},
+{d:"Azure Architecture & Services",q:"What is the purpose of Azure Traffic Manager?",o:["Managing employee commutes","A DNS-based traffic load balancer that distributes traffic across global Azure regions","A network monitoring tool","A file transfer service"],a:1,e:"Azure Traffic Manager is a DNS-based traffic load balancer. It distributes traffic across global Azure regions based on routing methods like performance, priority, weighted, or geographic, providing high availability and responsiveness."},
+{d:"Management & Governance",q:"Which Azure service should you use to set up automated, repeatable deployments that include policies, RBAC, and ARM templates as a package?",o:["Azure Monitor","Azure Blueprints","Azure Advisor","Azure CLI"],a:1,e:"Azure Blueprints lets you package ARM templates, policy assignments, role assignments, and resource groups into a single blueprint definition. This ensures repeatable, compliant deployments that maintain an active connection for auditing."},
+{d:"Management & Governance",q:"A team wants to manage Kubernetes clusters running in their own datacenter using Azure tools. Which service enables this?",o:["Azure Kubernetes Service","Azure Arc","Azure Container Instances","Azure Functions"],a:1,e:"Azure Arc extends Azure management capabilities to Kubernetes clusters running anywhere — on-premises, at the edge, or in other clouds. You can use Azure Policy, Azure Monitor, and other Azure services to manage these external clusters."},
+{d:"Management & Governance",q:"Which tool should you use to estimate the monthly cost of running 10 VMs, 2 SQL databases, and storage in Azure BEFORE deploying?",o:["Azure Cost Management","Azure Pricing Calculator","Azure TCO Calculator","Azure Advisor"],a:1,e:"The Azure Pricing Calculator lets you configure specific Azure products (VMs, databases, storage) and estimate their monthly cost before deployment. The TCO Calculator is for comparing on-premises vs Azure costs."},
+{d:"Management & Governance",q:"What Azure feature ensures that only compliant images can be used to create VMs?",o:["Azure Monitor","Azure Policy","Azure Advisor","Azure Load Balancer"],a:1,e:"Azure Policy can enforce compliance rules such as allowing only approved VM images. A policy can deny VM creation if the selected image doesn't match the approved list, ensuring security and standardization."},
+{d:"Management & Governance",q:"Which Azure monitoring feature would you use to track the performance of a live web application, including page load times, request rates, and exceptions?",o:["Azure Service Health","Application Insights","Azure Advisor","Azure Policy"],a:1,e:"Application Insights (part of Azure Monitor) is an APM service specifically designed for monitoring live web applications. It tracks request rates, response times, failure rates, exceptions, page views, and can detect performance anomalies."},
+{d:"Management & Governance",q:"What is the Azure Activity Log?",o:["A personal diary in the cloud","A platform log that records subscription-level events like resource creation, modification, and deletion","A chat history","A code changelog"],a:1,e:"The Azure Activity Log is a platform log that records subscription-level events — who created, updated, or deleted a resource, when, and what operation was performed. It's useful for auditing and troubleshooting and is retained for 90 days."},
+{d:"Cloud Concepts",q:"Which benefit of cloud computing ensures that an application performs well regardless of demand?",o:["Disaster recovery","Performance predictability","Cost management","Governance"],a:1,e:"Performance predictability ensures your application delivers consistent performance regardless of demand fluctuations. Cloud features like autoscaling, load balancing, and geo-distribution support this benefit."},
+{d:"Azure Architecture & Services",q:"What is a Network Virtual Appliance (NVA)?",o:["A physical network switch","A VM that performs network functions such as firewalling, WAN optimization, or routing","A DNS server","A load balancer service"],a:1,e:"An NVA is a VM from Azure Marketplace that performs specific network functions (firewall, WAN optimizer, router, load balancer). It provides fine-grained network control similar to on-premises network appliances."},
+{d:"Azure Architecture & Services",q:"What protocol does Azure ExpressRoute support for dynamic routing?",o:["HTTP","BGP (Border Gateway Protocol)","FTP","SMTP"],a:1,e:"Azure ExpressRoute uses BGP (Border Gateway Protocol) for exchanging routes between your on-premises network and Azure. BGP enables dynamic routing, automatic failover, and optimal path selection."},
+{d:"Azure Architecture & Services",q:"What is the maximum number of management group levels in Azure (including root)?",o:["3","6","10","Unlimited"],a:1,e:"Azure supports up to 6 levels of management groups (not including the root group). This hierarchy can accommodate the most complex organizational structures while keeping governance manageable."},
+{d:"Management & Governance",q:"What is Azure Lighthouse?",o:["A physical light in Azure datacenters","A service that enables cross-tenant management, allowing service providers to manage customer Azure resources","A monitoring dashboard","A CDN endpoint"],a:1,e:"Azure Lighthouse enables service providers and managed service partners to manage resources across multiple customer tenants at scale, with automation, enhanced visibility, and governance — all from the provider's own Entra ID tenant."},
+{d:"Management & Governance",q:"What is the Cloud Adoption Framework for Azure?",o:["A JavaScript framework","Microsoft's guidance and best practices for organizations adopting Azure — covering strategy, planning, readiness, migration, governance, and management","A cloud gaming platform","An AI training tool"],a:1,e:"The Cloud Adoption Framework (CAF) is a collection of documentation, guidance, best practices, and tools from Microsoft that help organizations plan and adopt Azure. It covers the full lifecycle: strategy, plan, ready, adopt (migrate/innovate), govern, and manage."},
+{d:"Management & Governance",q:"What is the Microsoft Well-Architected Framework?",o:["A building construction guide","A set of guiding tenets for improving the quality of workloads across five pillars: Reliability, Security, Cost Optimization, Operational Excellence, and Performance Efficiency","A VM naming convention","A network topology guide"],a:1,e:"The Well-Architected Framework provides a set of best practices across five pillars for building high-quality Azure workloads. It helps architects and developers evaluate their architectures and identify areas for improvement."},
+];
+
+// ===================== STATE =====================
+let quizQuestions=[], currentIndex=0, score=0, answered=[];
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pick(a,n){return shuffle([...a]).slice(0,n);}
+
+function startQuiz(){
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  let pool;
+  if(mode==='domain1') pool=Q.filter(q=>q.d==='Cloud Concepts');
+  else if(mode==='domain2') pool=Q.filter(q=>q.d==='Azure Architecture & Services');
+  else if(mode==='domain3') pool=Q.filter(q=>q.d==='Management & Governance');
+  else if(mode==='quick') pool=pick(Q,25);
+  else if(mode==='exam'){
+    // Weighted: ~14 D1 (28%), ~19 D2 (38%), ~17 D3 (34%)
+    const d1=pick(Q.filter(q=>q.d==='Cloud Concepts'),14);
+    const d2=pick(Q.filter(q=>q.d==='Azure Architecture & Services'),19);
+    const d3=pick(Q.filter(q=>q.d==='Management & Governance'),17);
+    pool=[...d1,...d2,...d3];
+  }
+  else pool=[...Q];
+  quizQuestions=shuffle([...pool]);
+  currentIndex=0; score=0; answered=[];
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=quizQuestions[currentIndex];
+  document.getElementById('progressBar').style.width=((currentIndex/quizQuestions.length)*100)+'%';
+  document.getElementById('qCounter').textContent=`Question ${currentIndex+1} / ${quizQuestions.length}`;
+  document.getElementById('qScore').textContent=`Score: ${score}`;
+  document.getElementById('qDomain').textContent=q.d;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qExplanation').classList.add('hidden');
+  document.getElementById('nextBtn').classList.add('hidden');
+  const optDiv=document.getElementById('qOptions');
+  optDiv.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option'; btn.textContent=opt;
+    btn.onclick=()=>selectAnswer(i);
+    optDiv.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx){
+  const q=quizQuestions[currentIndex];
+  const options=document.querySelectorAll('.option');
+  const correct=idx===q.a;
+  if(correct) score++;
+  answered.push({...q,selected:idx,correct});
+  options.forEach((btn,i)=>{
+    btn.classList.add('disabled'); btn.onclick=null;
+    if(i===q.a) btn.classList.add(i===idx?'correct':'show-correct');
+    if(i===idx&&!correct) btn.classList.add('incorrect');
+  });
+  document.getElementById('qScore').textContent=`Score: ${score}`;
+  const expDiv=document.getElementById('qExplanation');
+  expDiv.innerHTML=`<strong>${correct?'Correct!':'Incorrect.'}</strong> ${q.e}`;
+  expDiv.classList.remove('hidden');
+  document.getElementById('nextBtn').classList.remove('hidden');
+  document.getElementById('nextBtn').textContent=currentIndex===quizQuestions.length-1?'See Results':'Next →';
+}
+
+function nextQuestion(){
+  currentIndex++;
+  if(currentIndex>=quizQuestions.length) showResults();
+  else renderQuestion();
+}
+
+function showResults(){
+  document.getElementById('quiz').classList.add('hidden');
+  const pct=Math.round((score/quizQuestions.length)*100);
+  const pass=pct>=70;
+  const domains={};
+  answered.forEach(a=>{
+    if(!domains[a.d]) domains[a.d]={total:0,correct:0};
+    domains[a.d].total++;
+    if(a.correct) domains[a.d].correct++;
+  });
+  let domainHTML='';
+  for(const [name,data] of Object.entries(domains)){
+    const dpct=Math.round((data.correct/data.total)*100);
+    const color=dpct>=70?'var(--success)':dpct>=50?'var(--warning)':'var(--danger)';
+    domainHTML+=`<div class="domain-result"><div class="domain-result-header"><span>${name}</span><span>${data.correct}/${data.total} (${dpct}%)</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:${dpct}%;background:${color}"></div></div></div>`;
+  }
+  const missed=answered.filter(a=>!a.correct);
+  let missedHTML='';
+  if(missed.length>0){
+    missedHTML='<h3 style="margin:24px 0 12px;text-align:left">Questions to Review</h3><div class="review-list">';
+    missed.forEach(m=>{
+      missedHTML+=`<div class="review-item"><div class="ri-status incorrect">&#10007; Incorrect</div><div class="ri-q">${m.q}</div><div class="ri-a"><strong>Your answer:</strong> ${m.o[m.selected]}</div><div class="ri-a"><strong>Correct answer:</strong> ${m.o[m.a]}</div><div class="ri-a" style="margin-top:6px;color:var(--text)">${m.e}</div></div>`;
+    });
+    missedHTML+='</div>';
+  }
+  const res=document.getElementById('results');
+  res.innerHTML=`
+    <h2>Quiz Complete!</h2>
+    <div class="score-circle ${pass?'pass':'fail'}">${pct}%<small>${score} / ${quizQuestions.length}</small></div>
+    <div class="score-label" style="color:${pass?'var(--success)':'var(--danger)'}">${pass?'Passing Score (70% needed)':'Below Passing (70% needed)'}</div>
+    <div class="domain-results"><h3 style="margin-bottom:12px;text-align:left">Score by Domain</h3>${domainHTML}</div>
+    ${missedHTML}
+    <div class="btn-group" style="margin-top:30px">
+      <button class="btn btn-primary" onclick="retryQuiz()">Try Again</button>
+      <button class="btn btn-outline" onclick="backToMenu()">Back to Menu</button>
+    </div>`;
+  res.classList.remove('hidden');
+}
+
+function retryQuiz(){
+  document.getElementById('results').classList.add('hidden');
+  quizQuestions=shuffle([...quizQuestions]);
+  currentIndex=0; score=0; answered=[];
+  document.getElementById('quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function backToMenu(){
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('landing').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
