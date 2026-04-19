@@ -209,7 +209,7 @@
   <h3>Domain 2 &mdash; Architecture & Services</h3>
   <a href="#core-architecture">Core Architecture</a>
   <a href="#compute">Compute Services</a>
-  <a href="#networking">Networking Services</a>
+  <a href="#networking">Networking &amp; Endpoints</a>
   <a href="#storage">Storage Services</a>
   <a href="#databases">Database Services</a>
   <a href="#identity">Identity & Access</a>
@@ -637,6 +637,29 @@
 <div class="topic" id="networking">
   <h3>Networking Services</h3>
 
+  <h4>Virtual Networks and Subnets</h4>
+  <p>An <strong>Azure Virtual Network (VNet)</strong> is the fundamental building block for private networking in Azure. It enables Azure resources to securely communicate with each other, the internet, and on-premises networks.</p>
+  <ul>
+    <li><strong>Virtual Subnets</strong> divide a VNet into smaller address ranges, letting you organize and secure resources</li>
+    <li>Subnets enable you to group resources logically (e.g., a "web" subnet, a "database" subnet)</li>
+    <li>Use <strong>NSGs</strong> (Network Security Groups) on subnets to control traffic flow between them</li>
+    <li>Resources in different subnets within the same VNet can communicate by default</li>
+  </ul>
+
+  <div class="key-term"><strong>Subnets</strong> are segments within a VNet that let you isolate workloads. For example, put web servers in one subnet and databases in another, then use NSGs to restrict database access to only the web subnet.</div>
+
+  <h4>Public and Private Endpoints</h4>
+  <table class="compare-table">
+    <tr><th></th><th>Public Endpoint</th><th>Private Endpoint</th></tr>
+    <tr><td><strong>What it is</strong></td><td>A resource accessible over the <strong>public internet</strong> via a public IP</td><td>A resource accessible only through a <strong>private IP within your VNet</strong></td></tr>
+    <tr><td><strong>Traffic path</strong></td><td>Over the internet</td><td>Stays on Microsoft's backbone network</td></tr>
+    <tr><td><strong>Security</strong></td><td>Exposed to the internet (must be secured with firewalls, NSGs, etc.)</td><td>Not exposed to the internet; accessible only from your VNet</td></tr>
+    <tr><td><strong>Use case</strong></td><td>Public-facing websites, APIs</td><td>Databases, storage accounts, internal services</td></tr>
+  </table>
+
+  <div class="tip">Private endpoints are used to access Azure PaaS services (like Storage, SQL Database) securely over a private connection. The exam may ask how to make a storage account accessible only from within a VNet &mdash; the answer is a private endpoint.</div>
+
+  <h4>Networking Services</h4>
   <table class="compare-table">
     <tr><th>Service</th><th>What It Does</th><th>Key Detail</th></tr>
     <tr><td><strong>Virtual Network (VNet)</strong></td><td>Private network in Azure for your resources</td><td>Fundamental building block; enables resource communication</td></tr>
@@ -666,6 +689,17 @@
   <h4>Azure Storage Account</h4>
   <p>A storage account provides a unique namespace for your Azure Storage data. It's the container for all the storage types below. Every object has a unique URL address.</p>
 
+  <h4>Storage Account Types</h4>
+  <table class="compare-table">
+    <tr><th>Account Type</th><th>Supported Services</th><th>Performance</th><th>Use Case</th></tr>
+    <tr><td><strong>Standard general-purpose v2 (GPv2)</strong></td><td>Blob, File, Queue, Table, Data Lake</td><td>Standard (HDD-backed)</td><td>Recommended default for most scenarios</td></tr>
+    <tr><td><strong>Premium block blobs</strong></td><td>Blob (block blobs and append blobs only)</td><td>Premium (SSD-backed)</td><td>High transaction rates, low latency</td></tr>
+    <tr><td><strong>Premium file shares</strong></td><td>Azure Files only</td><td>Premium (SSD-backed)</td><td>Enterprise file shares needing high IOPS</td></tr>
+    <tr><td><strong>Premium page blobs</strong></td><td>Page blobs only</td><td>Premium (SSD-backed)</td><td>VM disks (unmanaged)</td></tr>
+  </table>
+
+  <div class="key-term"><strong>Standard GPv2</strong> is the recommended default storage account type. It supports all storage services and all redundancy options. Premium accounts use SSDs for low latency but cost more and support fewer redundancy options.</div>
+
   <h4>Storage Types</h4>
   <table class="compare-table">
     <tr><th>Service</th><th>What It Stores</th><th>Protocol/Access</th></tr>
@@ -681,9 +715,10 @@
     <tr><th>Tier</th><th>When to Use</th><th>Storage Cost</th><th>Access Cost</th><th>Min. Duration</th></tr>
     <tr><td><strong>Hot</strong></td><td>Frequently accessed data</td><td>Highest</td><td>Lowest</td><td>None</td></tr>
     <tr><td><strong>Cool</strong></td><td>Infrequently accessed, short-term backup</td><td>Lower</td><td>Higher</td><td>30 days</td></tr>
-    <tr><td><strong>Archive</strong></td><td>Rarely accessed, long-term archive</td><td>Lowest</td><td>Highest</td><td>180 days</td></tr>
+    <tr><td><strong>Cold</strong></td><td>Rarely accessed, stored for longer periods</td><td>Lower than Cool</td><td>Higher than Cool</td><td>90 days</td></tr>
+    <tr><td><strong>Archive</strong></td><td>Almost never accessed, long-term archive</td><td>Lowest</td><td>Highest</td><td>180 days</td></tr>
   </table>
-  <div class="key-term"><strong>Archive tier</strong> data is stored <strong>offline</strong>. To read it, you must first "rehydrate" it to hot or cool tier, which can take hours.</div>
+  <div class="key-term"><strong>Cold vs Cool vs Archive:</strong> Cool = 30-day minimum, Cold = 90-day minimum, Archive = 180-day minimum. Archive tier data is stored <strong>offline</strong> and must be "rehydrated" to Hot or Cool before reading (takes hours). Cold and Cool tiers are online and immediately accessible.</div>
 
   <h4>Storage Redundancy Options</h4>
   <table class="compare-table">
@@ -763,6 +798,38 @@
   </table>
 
   <div class="key-term"><strong>RBAC</strong> controls access to Azure resources. <strong>Entra ID roles</strong> control access to Entra ID objects (users, groups). They are separate systems.</div>
+
+  <h4>Authentication vs Authorization</h4>
+  <table class="compare-table">
+    <tr><th></th><th>Authentication (AuthN)</th><th>Authorization (AuthZ)</th></tr>
+    <tr><td><strong>Question</strong></td><td>"Who are you?"</td><td>"What are you allowed to do?"</td></tr>
+    <tr><td><strong>Purpose</strong></td><td>Verifies the user's <strong>identity</strong></td><td>Determines the user's <strong>permissions</strong></td></tr>
+    <tr><td><strong>Happens</strong></td><td>First &mdash; before authorization</td><td>Second &mdash; after identity is confirmed</td></tr>
+    <tr><td><strong>Challenges with</strong></td><td>Credentials (password, MFA, biometrics)</td><td>Policies, roles, and rules</td></tr>
+    <tr><td><strong>Azure tool</strong></td><td>Microsoft Entra ID (identity provider)</td><td>Azure RBAC (role assignments)</td></tr>
+  </table>
+
+  <div class="tip">The exam tests whether you understand that authentication proves identity (who you are) while authorization determines access level (what you can do). Authentication always happens first.</div>
+
+  <h4>Microsoft Entra Domain Services</h4>
+  <p>A managed domain service that provides <strong>classic Active Directory features</strong> in the cloud without deploying or managing domain controllers.</p>
+  <ul>
+    <li>Provides <strong>domain join, group policy, LDAP, and Kerberos/NTLM authentication</strong></li>
+    <li>Fully managed by Azure &mdash; no need to deploy, manage, or patch domain controllers</li>
+    <li>Integrates with your existing Microsoft Entra ID tenant</li>
+    <li>Enables legacy apps that require domain services to run in the cloud</li>
+    <li>One-way sync from Entra ID &rarr; Entra Domain Services (not the other way)</li>
+  </ul>
+
+  <table class="compare-table">
+    <tr><th></th><th>On-premises AD DS</th><th>Microsoft Entra ID</th><th>Entra Domain Services</th></tr>
+    <tr><td><strong>Type</strong></td><td>Traditional domain services</td><td>Cloud identity provider</td><td>Managed domain services in cloud</td></tr>
+    <tr><td><strong>Protocols</strong></td><td>Kerberos, LDAP, NTLM</td><td>SAML, OAuth, OpenID Connect</td><td>Kerberos, LDAP, NTLM</td></tr>
+    <tr><td><strong>Management</strong></td><td>You manage everything</td><td>Microsoft manages</td><td>Microsoft manages DCs</td></tr>
+    <tr><td><strong>Use case</strong></td><td>On-premises apps</td><td>Modern cloud/SaaS apps</td><td>Legacy apps that need domain join/LDAP in the cloud</td></tr>
+  </table>
+
+  <div class="key-term"><strong>When to choose Entra Domain Services:</strong> You have legacy applications that use LDAP, Kerberos, or NTLM and need to move them to the cloud, but you don't want to manage domain controllers yourself.</div>
 
   <h4>Security Models</h4>
 
@@ -1099,10 +1166,14 @@
     <li onclick="this.classList.toggle('done')">I know the Azure hierarchy: Management Groups &gt; Subscriptions &gt; Resource Groups &gt; Resources</li>
     <li onclick="this.classList.toggle('done')">I understand Regions, Region Pairs, Availability Zones, and Sovereign Regions</li>
     <li onclick="this.classList.toggle('done')">I can describe all compute services (VMs, Scale Sets, App Service, Functions, ACI, AKS, Virtual Desktop)</li>
-    <li onclick="this.classList.toggle('done')">I know all networking services and the difference between VPN Gateway and ExpressRoute</li>
-    <li onclick="this.classList.toggle('done')">I understand storage types, access tiers (Hot/Cool/Archive), and redundancy options (LRS/ZRS/GRS/GZRS)</li>
+    <li onclick="this.classList.toggle('done')">I know all networking services, VNets, subnets, and the difference between VPN Gateway and ExpressRoute</li>
+    <li onclick="this.classList.toggle('done')">I understand public vs private endpoints and when to use each</li>
+    <li onclick="this.classList.toggle('done')">I know storage account types (Standard GPv2 vs Premium) and when to use each</li>
+    <li onclick="this.classList.toggle('done')">I understand storage types, access tiers (Hot/Cool/Cold/Archive), and redundancy options (LRS/ZRS/GRS/GZRS)</li>
     <li onclick="this.classList.toggle('done')">I can compare Azure SQL, Cosmos DB, and other database services</li>
-    <li onclick="this.classList.toggle('done')">I understand Entra ID, SSO, MFA, Conditional Access, and RBAC</li>
+    <li onclick="this.classList.toggle('done')">I can explain the difference between authentication and authorization</li>
+    <li onclick="this.classList.toggle('done')">I understand Entra ID, Entra Domain Services, SSO, MFA, Conditional Access, and RBAC</li>
+    <li onclick="this.classList.toggle('done')">I can compare Entra ID vs Entra Domain Services vs on-premises AD DS</li>
     <li onclick="this.classList.toggle('done')">I know Zero Trust (3 principles) and Defense in Depth (7 layers)</li>
     <li onclick="this.classList.toggle('done')">I can describe security services: Defender, Key Vault, DDoS Protection, Firewall, NSGs, Bastion, Sentinel</li>
     <li onclick="this.classList.toggle('done')">I know the 3 cost calculators and when to use each</li>
